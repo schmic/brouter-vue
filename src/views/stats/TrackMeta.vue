@@ -1,7 +1,7 @@
 <template>
-    <article class="message is-primary">
+    <article class="message is-grey">
         <div class="message-header">
-            <p>Statistic</p>
+            Statistic
         </div>
         <div class="message-body">
             <nav class="level is-mobile">
@@ -14,6 +14,9 @@
                 </div>
                 <div class="level-item has-text-centered">
                     <i class="fa fa-angle-double-up"></i> {{ trackStats.ascend }} m
+                </div>
+                <div class="level-item has-text-centered">
+                    <i class="fa fa-angle-double-down"></i> {{ trackStats.descend || 0 }} m
                 </div>
             </nav>
         </div>

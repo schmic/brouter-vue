@@ -23,6 +23,24 @@
                     :attribution="tileProvider.attribution"
                     layer-type="base"
                 />
+                <l-control position="topleft">
+                    <div class="buttons has-addons">
+                        <button
+                            class="button is-white is-rounded"
+                            :class="{ 'is-success': mapOptions.editable }"
+                            @click="toggleMapEditable"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-pen"></i>
+                            </span>
+                        </button>
+                        <button class="button is-white is-rounded" @click="clearWaypoints">
+                            <span class="icon">
+                                <i class="fa fa-trash"></i>
+                            </span>
+                        </button>
+                    </div>
+                </l-control>
                 <l-layer-group layer-type="overlay" name="Markers">
                     <l-marker
                         v-for="(marker, index) in markers"
@@ -34,16 +52,9 @@
                         @click="markerClicked(index, marker.id, $event)"
                     ></l-marker>
                 </l-layer-group>
+                <l-layer-group layer-type="overlay" name="NoGo"> </l-layer-group>
+                <l-layer-group layer-type="overlay" name="POI"> </l-layer-group>
                 <l-geo-json :geojson="geojson"></l-geo-json>
-                <l-control position="topleft">
-                    <a
-                        class="button is-rounded"
-                        :class="{ 'is-success': mapOptions.editable }"
-                        @click="toggleMapEditable"
-                    >
-                        <i class="fa fa-pen"></i>
-                    </a>
-                </l-control>
             </l-map>
         </div>
     </div>
@@ -118,6 +129,10 @@ export default {
         },
         toggleMapEditable() {
             this.mapOptions.editable = !this.mapOptions.editable;
+        },
+        clearWaypoints() {
+            this.markers = [];
+            this.geojson = [];
         },
         async calcRoute() {
             console.log('location', location);
