@@ -1,10 +1,29 @@
 <template>
     <div class="columns is-mobile">
         <div class="column is-one-quarter">
-            <p>Center is at {{ currentCenter }} and the zoom is: {{ currentZoom }}</p>
-            <button @click="showMap = !showMap">
+            <article class="message is-primary">
+                <div class="message-header">
+                    <p>Map</p>
+                </div>
+                <div class="message-body">
+                    <p>Center {{ currentCenter.lat.toFixed(4) }} / {{ currentCenter.lng.toFixed(4) }}</p>
+                    <p>Zoom is: {{ currentZoom }}</p>
+                </div>
+            </article>
+
+            <!-- <button @click="showMap = !showMap">
                 Toggle map
-            </button>
+            </button> -->
+            <article class="message is-success">
+                <div class="message-header">
+                    <p>Statistic</p>
+                </div>
+                <div class="message-body">
+                    <p>Distance: {{ (distance / 1000).toFixed(2) }} km</p>
+                    <p>Duration: {{ formattedtime }} h</p>
+                    <p>Ascend: {{ ascend }} m</p>
+                </div>
+            </article>
         </div>
         <div class="column">
             <l-map
@@ -118,7 +137,11 @@ export default {
             showMap: true,
             geojson: [],
             markersVisible: false,
-            markers: []
+            markers: [],
+            distance: 0,
+            totaltime: 0,
+            formattedtime: '0:00',
+            ascend: 0
         };
     },
     methods: {
@@ -143,7 +166,7 @@ export default {
         clickHandler(evt) {
             console.log('evt', evt);
         },
-        calcRoute() {
+        async calcRoute() {
             this.geojson = [];
             const baseURL = 'http://localhost:17777/brouter?profile=fastbike&alternativeidx=0&format=geojson';
 
@@ -151,10 +174,30 @@ export default {
                 const url = `${baseURL}&lonlats=${this.markers[i].latlng.lng},${this.markers[i].latlng.lat}|${
                     this.markers[i + 1].latlng.lng
                 },${this.markers[i + 1].latlng.lat}`;
-                fetch(url).then(resp => {
-                    resp.json().then(data => this.geojson.push(data));
-                });
+                let response = await fetch(url);
+                let data = await response.json();
+                this.geojson.push(data);
             }
+            this.distance = this.geojson
+                .map(segment => {
+                    return parseInt(segment.features[0].properties['track-length']);
+                })
+                .reduce((a, b) => a + b, 0);
+
+            this.totaltime = this.geojson
+                .map(segment => {
+                    return parseInt(segment.features[0].properties['total-time']);
+                })
+                .reduce((a, b) => a + b, 0);
+
+            this.formattedtime =
+                Math.trunc(this.totaltime / 3600) + ':' + ('0' + Math.trunc((this.totaltime % 3600) / 60)).slice(-2);
+
+            this.ascend = this.geojson
+                .map(segment => {
+                    return parseInt(segment.features[0].properties['filtered ascend']);
+                })
+                .reduce((a, b) => a + b, 0);
         }
     }
 };

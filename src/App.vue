@@ -8,11 +8,6 @@
                         <i class="fab fa-github"></i>
                     </span>
                 </a>
-                <a class="navbar-item is-hidden-desktop" href="https://twitter.com/theschmic" target="_blank">
-                    <span class="icon" style="color: #55acee;">
-                        <i class="fab fa-twitter"></i>
-                    </span>
-                </a>
                 <div class="navbar-burger burger" data-target="navMenuTop">
                     <span></span>
                     <span></span>
@@ -62,8 +57,12 @@
                     </div> -->
                 </div>
                 <div class="navbar-end">
-                    <a class="navbar-item" href="https://github.com/schmic/brouter-vue" target="_blank">Github</a>
-                    <a class="navbar-item" href="https://twitter.com/theschmic" target="_blank">Twitter</a>
+                    <a class="navbar-item" href="https://github.com/schmic/brouter-vue" target="_blank">
+                        <span class="icon" style="color: #333;margin-right: 4px">
+                            <i class="fab fa-github"></i>
+                        </span>
+                        Github
+                    </a>
                     <!-- <div class="navbar-item">
                         <div class="field is-grouped">
                             <p class="control">
@@ -83,28 +82,10 @@
             <router-view />
         </section>
         <footer class="level">
-            <div class="level-item has-text-centered">
+            <div v-if="false" class="level-item has-text-centered">
                 <div>
                     <p class="heading">Tweets</p>
                     <p class="title">3,456</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Following</p>
-                    <p class="title">123</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Followers</p>
-                    <p class="title">456K</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Likes</p>
-                    <p class="title">789</p>
                 </div>
             </div>
         </footer>
