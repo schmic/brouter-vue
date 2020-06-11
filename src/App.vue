@@ -16,7 +16,6 @@
             </div>
             <div id="navMenuTop" class="navbar-menu">
                 <div class="navbar-start">
-                    <router-link class="navbar-item" to="/about">About</router-link>
                     <router-link class="navbar-item" to="/map">Map</router-link>
                     <!-- <div class="navbar-item has-dropdown is-hoverable">
                         <a class="navbar-link is-active" href="#">Docs</a>
