@@ -1,54 +1,79 @@
 <template>
-    <div style="height: 500px; width: 100%;">
-        <div style="height: 200px; overflow: auto;">
-            <p>First marker is placed at {{ withPopup.lat }}, {{ withPopup.lng }}</p>
+    <div class="columns is-mobile">
+        <div class="column is-one-quarter">
             <p>Center is at {{ currentCenter }} and the zoom is: {{ currentZoom }}</p>
-            <button @click="showLongText">
-                Toggle long popup
-            </button>
             <button @click="showMap = !showMap">
                 Toggle map
             </button>
         </div>
-        <l-map
-            v-if="showMap"
-            :zoom="zoom"
-            :center="center"
-            :options="mapOptions"
-            style="height: 80%;"
-            @update:center="centerUpdate"
-            @update:zoom="zoomUpdate"
-        >
-            <l-tile-layer :url="url" :attribution="attribution" />
-            <l-marker :lat-lng="withPopup">
-                <l-popup>
-                    <div @click="innerClick">
-                        I am a popup
-                        <p v-show="showParagraph">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed pretium nisl, ut
-                            sagittis sapien. Sed vel sollicitudin nisi. Donec finibus semper metus id malesuada.
-                        </p>
-                    </div>
-                </l-popup>
-            </l-marker>
-            <l-marker :lat-lng="withTooltip">
-                <l-tooltip :options="{ permanent: true, interactive: true }">
-                    <div @click="innerClick">
-                        I am a tooltip
-                        <p v-show="showParagraph">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed pretium nisl, ut
-                            sagittis sapien. Sed vel sollicitudin nisi. Donec finibus semper metus id malesuada.
-                        </p>
-                    </div>
-                </l-tooltip>
-            </l-marker>
-        </l-map>
+        <div class="column">
+            <l-map
+                v-if="showMap"
+                :zoom="zoom"
+                :center="center"
+                :options="mapOptions"
+                @update:center="centerUpdate"
+                @update:zoom="zoomUpdate"
+                @click="mapClicked"
+            >
+                <l-control-layers :position="position" :collapsed="false" :sort-layers="true" />
+                <l-tile-layer
+                    v-for="tileProvider in tileProviders"
+                    :key="tileProvider.name"
+                    :name="tileProvider.name"
+                    :visible="tileProvider.visible"
+                    :url="tileProvider.url"
+                    :attribution="tileProvider.attribution"
+                    layer-type="base"
+                />
+                <l-layer-group layer-type="overlay" name="Markers">
+                    <l-marker
+                        v-for="(marker, index) in markers"
+                        :name="marker.id"
+                        :key="marker.id"
+                        :draggable="true"
+                        :lat-lng="marker.latlng"
+                        @update:lat-lng="markerMoved(index, marker.id, $event)"
+                        @click="markerClicked(index, marker.id, $event)"
+                    ></l-marker>
+                </l-layer-group>
+                <l-geo-json :geojson="geojson"></l-geo-json>
+                <l-control position="bottomright">
+                    <button @click="clickHandler">
+                        I am a useless button!
+                    </button>
+                    <button @click="clickHandler">
+                        I am a useless button!
+                    </button>
+                    <button @click="clickHandler">
+                        I am a useless button!
+                    </button>
+                </l-control>
+            </l-map>
+        </div>
     </div>
 </template>
 
 <script>
+import { Icon } from 'leaflet';
+
+delete Icon.Default.prototype._getIconUrl;
+Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
+
 import { latLng } from 'leaflet';
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LControl, LLayerGroup, LControlLayers, LGeoJson } from 'vue2-leaflet';
+
+function uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (Math.random() * 16) | 0,
+            v = c == 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
 
 export default {
     name: 'Example',
@@ -56,39 +81,91 @@ export default {
         LMap,
         LTileLayer,
         LMarker,
-        LPopup,
-        LTooltip
+        LControl,
+        LControlLayers,
+        LLayerGroup,
+        LGeoJson
     },
     data() {
         return {
+            tileProviders: [
+                {
+                    name: 'OpenStreetMap',
+                    visible: true,
+                    attribution:
+                        '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+                    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                },
+                {
+                    name: 'OpenTopoMap',
+                    visible: false,
+                    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                    attribution:
+                        'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                }
+            ],
             zoom: 13,
-            center: latLng(47.41322, -1.219482),
-            url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-            withPopup: latLng(47.41322, -1.219482),
-            withTooltip: latLng(47.41422, -1.250482),
+            center: latLng(49.706256, 8.625321),
             currentZoom: 11.5,
-            currentCenter: latLng(47.41322, -1.219482),
+            currentCenter: latLng(49.701169, 8.621349),
             showParagraph: false,
             mapOptions: {
+                zoomControl: false,
+                attributionControl: true,
                 zoomSnap: 0.5
             },
-            showMap: true
+            position: 'topright',
+            showMap: true,
+            geojson: [],
+            markersVisible: false,
+            markers: []
         };
     },
     methods: {
+        mapClicked(evt) {
+            this.markers.push({ id: uuid(), latlng: evt.latlng });
+            this.calcRoute();
+        },
+        markerClicked(index) {
+            this.markers.splice(index, 1);
+            this.calcRoute();
+        },
+        markerMoved(index, id, latlng) {
+            this.markers[index].latlng = latlng;
+            this.calcRoute();
+        },
         zoomUpdate(zoom) {
             this.currentZoom = zoom;
         },
         centerUpdate(center) {
             this.currentCenter = center;
         },
-        showLongText() {
-            this.showParagraph = !this.showParagraph;
+        clickHandler(evt) {
+            console.log('evt', evt);
         },
-        innerClick() {
-            alert('Click!');
+        calcRoute() {
+            this.geojson = [];
+            const baseURL = 'http://localhost:17777/brouter?profile=fastbike&alternativeidx=0&format=geojson';
+
+            for (let i = 0; i < this.markers.length - 1; i++) {
+                const url = `${baseURL}&lonlats=${this.markers[i].latlng.lng},${this.markers[i].latlng.lat}|${
+                    this.markers[i + 1].latlng.lng
+                },${this.markers[i + 1].latlng.lat}`;
+                fetch(url).then(resp => {
+                    resp.json().then(data => this.geojson.push(data));
+                });
+            }
         }
     }
 };
 </script>
+
+<style scoped>
+.container,
+.columns {
+    flex: 1;
+}
+.columns > .column {
+    padding-bottom: 0;
+}
+</style>

@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+    ## usage: docker-compose run --rm -p 8080:8080 serve
+    ##      : docker-compose up (-d) serve
+    serve:
+        command: yarn run serve
+        image: node:lts
+        ports:
+            - 8080:8080
+        user: '1000'
+        volumes:
+            - ./:/src
+        working_dir: /src
+
+    ## usage: docker-compose run --rm install
+    install:
+        command: yarn install
+        image: node:lts
+        user: '1000'
+        volumes:
+            - ./:/src
+        working_dir: /src

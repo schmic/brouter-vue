@@ -1,16 +1,9 @@
 <template>
     <div id="app">
-        <nav class="navbar is-danger">
+        <nav class="navbar is-primary">
             <div class="navbar-brand">
-                <router-link class="navbar-item" to="/">
-                    <img
-                        src="https://bulma.io/images/bulma-logo.png"
-                        alt="Bulma: a modern CSS framework based on Flexbox"
-                        width="112"
-                        height="28"
-                    />
-                </router-link>
-                <a class="navbar-item is-hidden-desktop" href="https://github.com/schmic/fitalyzr" target="_blank">
+                <router-link class="navbar-item" to="/"> BRouter-Vue</router-link>
+                <a class="navbar-item is-hidden-desktop" href="https://github.com/schmic/brouter-vue" target="_blank">
                     <span class="icon" style="color: #333;">
                         <i class="fab fa-github"></i>
                     </span>
@@ -28,6 +21,7 @@
             </div>
             <div id="navMenuTop" class="navbar-menu">
                 <div class="navbar-start">
+                    <router-link class="navbar-item" to="/about">About</router-link>
                     <router-link class="navbar-item" to="/map">Map</router-link>
                     <!-- <div class="navbar-item has-dropdown is-hoverable">
                         <a class="navbar-link is-active" href="#">Docs</a>
@@ -88,13 +82,59 @@
         <section class="section">
             <router-view />
         </section>
+        <footer class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    <p class="heading">Tweets</p>
+                    <p class="title">3,456</p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered">
+                <div>
+                    <p class="heading">Following</p>
+                    <p class="title">123</p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered">
+                <div>
+                    <p class="heading">Followers</p>
+                    <p class="title">456K</p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered">
+                <div>
+                    <p class="heading">Likes</p>
+                    <p class="title">789</p>
+                </div>
+            </div>
+        </footer>
     </div>
 </template>
 
 <style>
+html,
+body {
+    height: 100%;
+}
+
 #app {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
+
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#app > section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+#app > footer {
+    padding: 0.75rem 0;
 }
 </style>
