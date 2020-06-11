@@ -7,4 +7,3 @@ RUN yarn run build
 
 FROM nginx:alpine
 COPY --from=build /build/dist /usr/share/nginx/html
-VOLUME [ "/usr/share/nginx/html" ]
