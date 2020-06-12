@@ -2,13 +2,16 @@
     <div class="columns is-mobile">
         <div class="column is-one-quarter">
             <track-meta :track-stats="stats"></track-meta>
+            <waypoint-list :waypoints="waypoints"></waypoint-list>
         </div>
         <div class="column">
             <l-map
-                :style="{ cursor: mapOptions.editable ? 'crosshair' : 'default' }"
+                ref="map"
+                :style="{ cursor: mapOptions.addWaypoint || mapOptions.addNogo ? 'crosshair' : 'default' }"
                 :zoom="zoom"
                 :center="center"
                 :options="mapOptions"
+                @ready="mapReady"
                 @update:center="centerUpdate"
                 @update:zoom="zoomUpdate"
                 @click="mapClicked"
@@ -25,36 +28,52 @@
                 />
                 <l-control position="topleft">
                     <div class="buttons has-addons">
-                        <button
-                            class="button is-white is-rounded"
-                            :class="{ 'is-success': mapOptions.editable }"
-                            @click="toggleMapEditable"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-pen"></i>
-                            </span>
-                        </button>
                         <button class="button is-white is-rounded" @click="clearWaypoints">
                             <span class="icon">
                                 <i class="fa fa-trash"></i>
                             </span>
                         </button>
+                        <button
+                            class="button is-white is-rounded"
+                            :class="{ 'is-success': mapOptions.addNogo }"
+                            @click="mapOptions.addNogo = !mapOptions.addNogo"
+                        >
+                            <span class="icon">
+                                <i class="far fa-circle"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-white is-rounded"
+                            :class="{ 'is-success': mapOptions.addWaypoint }"
+                            @click="mapOptions.addWaypoint = !mapOptions.addWaypoint"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-pen"></i>
+                            </span>
+                        </button>
                     </div>
                 </l-control>
-                <l-layer-group layer-type="overlay" name="Markers">
+                <l-layer-group layer-type="overlay" name="waypoints">
                     <l-marker
-                        v-for="(marker, index) in markers"
+                        v-for="(marker, index) in waypoints"
                         :name="marker.id"
                         :key="marker.id"
-                        :draggable="mapOptions.editable"
+                        :draggable="mapOptions.addWaypoint"
                         :lat-lng="marker.latlng"
-                        @update:lat-lng="markerMoved(index, marker.id, $event)"
-                        @click="markerClicked(index, marker.id, $event)"
+                        @update:lat-lng="waypointMoved(index, marker.id, $event)"
+                        @click="waypointClicked(index, marker.id, $event)"
                     ></l-marker>
                 </l-layer-group>
-                <l-layer-group layer-type="overlay" name="NoGo"> </l-layer-group>
+                <l-layer-group layer-type="overlay" name="NoGo">
+                    <l-circle
+                        v-for="(nogo, index) in nogos"
+                        :key="nogo.id"
+                        :lat-lng="nogo.latlng"
+                        :radius="nogo.radius"
+                        @click="nogoClicked(index, nogo.id, $event)"
+                    />
+                </l-layer-group>
                 <l-layer-group layer-type="overlay" name="POI"> </l-layer-group>
-                <l-geo-json :geojson="geojson"></l-geo-json>
             </l-map>
         </div>
     </div>
@@ -62,7 +81,7 @@
 
 <script>
 import { Icon, latLng } from 'leaflet';
-import { LMap, LTileLayer, LMarker, LControl, LLayerGroup, LControlLayers, LGeoJson } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LControl, LCircle, LLayerGroup, LControlLayers } from 'vue2-leaflet';
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -71,34 +90,40 @@ Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
-import TrackMeta from '@/views/stats/TrackMeta.vue';
+import TrackMeta from '@/components/TrackMeta.vue';
+import WaypointList from '@/components/WaypointList.vue';
 import { TileProviders, UUID } from '../util/';
 
 export default {
     name: 'Map',
     components: {
         TrackMeta,
+        WaypointList,
         LMap,
         LTileLayer,
         LMarker,
         LControl,
+        LCircle,
         LControlLayers,
-        LLayerGroup,
-        LGeoJson
+        LLayerGroup
     },
     data() {
         return {
+            trackDrawer: undefined,
             tileProviders: TileProviders,
             mapOptions: {
                 zoomControl: false,
                 attributionControl: true,
                 zoomSnap: 0.5,
-                editable: false
+                addWaypoint: false,
+                addNogo: false
             },
             zoom: 13,
             center: latLng(49.706256, 8.625321),
-            geojson: [],
-            markers: [],
+            waypoints: [],
+            nogos: [],
+            pois: [],
+            route: [],
             stats: {
                 distance: 0,
                 totaltime: 0,
@@ -107,19 +132,53 @@ export default {
             }
         };
     },
+    mounted() {
+        // this.$nextTick(() => {
+        //     this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
+        // });
+    },
+    computed: {
+        geojson() {
+            return this.trackDrawer.toGeoJSON();
+        }
+    },
     methods: {
+        mapReady() {
+            let self = this;
+            this.trackDrawer = window.L.TrackDrawer.track({
+                routingCallback: function(markerStart, markerEnd, done) {
+                    self.getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng()).then(
+                        data => {
+                            done(
+                                null,
+                                data.features[0].geometry.coordinates.map(c => [c[1], c[0], c[2]]) // convert, urgh!
+                            );
+                        },
+                        err => done(err)
+                    );
+                }
+            }).addTo(this.$refs.map.mapObject);
+        },
         mapClicked(evt) {
-            if (!this.mapOptions.editable) return;
-            this.markers.push({ id: UUID(), latlng: evt.latlng });
-            this.calcRoute();
+            console.log('mapClicked.evt', evt);
+            if (this.mapOptions.addNogo) this.nogos.push({ id: UUID(), radius: 5000, latlng: evt.latlng });
+            // if (this.mapOptions.addWaypoint) this.waypoints.push({ id: UUID(), latlng: evt.latlng });
+
+            if (this.mapOptions.addWaypoint) {
+                let node = new window.L.TrackDrawer.Node(evt.latlng);
+                this.trackDrawer.addNode(node);
+            }
         },
-        markerClicked(index) {
-            this.markers.splice(index, 1);
-            this.calcRoute();
+        nogoClicked(index, nogoId, evt) {
+            console.log('nogoClicked.evt', evt);
         },
-        markerMoved(index, id, latlng) {
-            this.markers[index].latlng = latlng;
-            this.calcRoute();
+        waypointClicked(index, waypointId, evt) {
+            console.log('waypointClicked.evt', evt);
+            if (!this.mapOptions.addWaypoint) return;
+            this.waypoints.splice(index, 1);
+        },
+        waypointMoved(index, id, latlng) {
+            this.waypoints[index].latlng = latlng;
         },
         zoomUpdate(zoom) {
             console.log('zoom', zoom);
@@ -127,28 +186,36 @@ export default {
         centerUpdate(center) {
             console.log('center', center);
         },
-        toggleMapEditable() {
-            this.mapOptions.editable = !this.mapOptions.editable;
-        },
         clearWaypoints() {
-            this.markers = [];
-            this.geojson = [];
+            this.waypoints = [];
+            this.clearRoute();
         },
-        async calcRoute() {
-            console.log('location', location);
-
-            this.geojson = [];
+        clearRoute() {
+            this.route = [];
+        },
+        async getRouteSegment(from, to) {
             let baseURL = '/brouter?profile=fastbike&alternativeidx=0&format=geojson';
             baseURL = location.hostname == 'localhost' ? 'http://localhost:17777' + baseURL : baseURL;
+            const url = `${baseURL}&lonlats=${from.lng},${from.lat}|${to.lng},${to.lat}`;
+            console.log('url', url);
 
-            for (let i = 0; i < this.markers.length - 1; i++) {
-                const url = `${baseURL}&lonlats=${this.markers[i].latlng.lng},${this.markers[i].latlng.lat}|${
-                    this.markers[i + 1].latlng.lng
-                },${this.markers[i + 1].latlng.lat}`;
-                let response = await fetch(url);
-                let data = await response.json();
-                this.geojson.push(data);
+            let response = await fetch(url);
+            let data = await response.json();
+            return data;
+        },
+        async calcRoute() {
+            for (let i = 0; i < this.waypoints.length - 1; i++) {
+                const from = this.waypoints[i].latlng;
+                const to = this.waypoints[i + 1].latlng;
+                let data = await this.getRouteSegment(from, to);
+                this.route[i] = {
+                    from: from,
+                    to: to,
+                    geojson: data
+                };
             }
+            this.route = [].concat(this.route);
+            console.log('this.route', this.route);
 
             this.stats.distance = this.geojson
                 .map(segment => {
@@ -172,6 +239,12 @@ export default {
                     return parseInt(segment.features[0].properties['filtered ascend']);
                 })
                 .reduce((a, b) => a + b, 0);
+        }
+    },
+    watch: {
+        waypoints() {
+            // FIXME: use state engine
+            this.calcRoute();
         }
     }
 };
