@@ -28,13 +28,13 @@
                 />
                 <l-control position="topleft">
                     <div class="buttons has-addons">
-                        <button class="button is-white is-rounded" @click="clearWaypoints">
+                        <button class="button is-small is-dark is-rounded" @click="clearWaypoints">
                             <span class="icon">
                                 <i class="fa fa-trash"></i>
                             </span>
                         </button>
                         <button
-                            class="button is-white is-rounded"
+                            class="button is-small is-dark is-rounded"
                             :class="{ 'is-success': mapOptions.addNogo }"
                             @click="mapOptions.addNogo = !mapOptions.addNogo"
                         >
@@ -43,9 +43,45 @@
                             </span>
                         </button>
                         <button
-                            class="button is-white is-rounded"
-                            :class="{ 'is-success': mapOptions.addWaypoint }"
-                            @click="mapOptions.addWaypoint = !mapOptions.addWaypoint"
+                            class="button is-small is-dark is-rounded"
+                            :class="{ 'is-success': toolBarMode === 'insert' }"
+                            @click="setToolBarMode('insert')"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-cut"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            :class="{ 'is-success': toolBarMode === 'promote' }"
+                            @click="setToolBarMode('promote')"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-bed"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            :class="{ 'is-success': toolBarMode === 'demote' }"
+                            @click="setToolBarMode('demote')"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-map-signs"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            :class="{ 'is-success': toolBarMode === 'delete' }"
+                            @click="setToolBarMode('delete')"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-trash"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            :class="{ 'is-success': toolBarMode === 'add' }"
+                            @click="setToolBarMode('add')"
                         >
                             <span class="icon">
                                 <i class="fa fa-pen"></i>
@@ -92,7 +128,7 @@ Icon.Default.mergeOptions({
 
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
-import { TileProviders, UUID } from '../util/';
+import { TileProviders } from '../util/';
 
 export default {
     name: 'Map',
@@ -110,11 +146,13 @@ export default {
     data() {
         return {
             trackDrawer: undefined,
+            trackDrawerToolBar: undefined,
             tileProviders: TileProviders,
             mapOptions: {
                 zoomControl: false,
                 attributionControl: true,
                 zoomSnap: 0.5,
+                editable: true,
                 addWaypoint: false,
                 addNogo: false
             },
@@ -138,14 +176,23 @@ export default {
         // });
     },
     computed: {
-        geojson() {
-            return this.trackDrawer.toGeoJSON();
+        toolBarMode: {
+            get() {
+                return this.trackDrawerToolBar && this.trackDrawerToolBar.options.mode;
+            },
+            set(mode) {
+                return this.trackDrawerToolBar.setMode(mode);
+            }
         }
     },
     methods: {
+        setToolBarMode(mode) {
+            this.toolBarMode = mode == this.toolBarMode ? null : mode;
+        },
         mapReady() {
             let self = this;
             this.trackDrawer = window.L.TrackDrawer.track({
+                debug: false,
                 routingCallback: function(markerStart, markerEnd, done) {
                     self.getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng()).then(
                         data => {
@@ -158,12 +205,16 @@ export default {
                     );
                 }
             }).addTo(this.$refs.map.mapObject);
+            this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
         },
         mapClicked(evt) {
             console.log('mapClicked.evt', evt);
-            if (this.mapOptions.addNogo) this.nogos.push({ id: UUID(), radius: 5000, latlng: evt.latlng });
+            // if (this.mapOptions.addNogo) this.nogos.push({ id: UUID(), radius: 5000, latlng: evt.latlng });
             // if (this.mapOptions.addWaypoint) this.waypoints.push({ id: UUID(), latlng: evt.latlng });
 
+            if (this.mapOptions.addNogo) {
+                this.$refs.map.mapObject.editTools.startCircle(evt.latlng);
+            }
             if (this.mapOptions.addWaypoint) {
                 let node = new window.L.TrackDrawer.Node(evt.latlng);
                 this.trackDrawer.addNode(node);
@@ -250,7 +301,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .container,
 .columns {
     flex: 1;
