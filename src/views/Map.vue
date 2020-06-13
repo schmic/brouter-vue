@@ -160,31 +160,25 @@ export default {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
             this.trackDrawer.on('TrackDrawer:done', () => {
-                let nodes = this.trackDrawer.getNodes()[0];
-                if (nodes) {
-                    this.waypoints = nodes.markers.map(
-                        marker => new Waypoint(marker._leaflet_id, undefined, marker._latlng, marker.options)
-                    );
-                } else {
-                    this.resetWaypoints();
-                }
+                let markers = [];
+                this.trackDrawer.getNodes().map(node => (markers = markers.concat(node.markers)));
+                this.waypoints = markers.map(
+                    marker => new Waypoint(marker._leaflet_id, undefined, marker._latlng, marker.options)
+                );
 
-                let steps = this.trackDrawer.getSteps()[0];
-                if (steps) {
-                    this.segments = steps.edges.map(
-                        edge =>
-                            new Segment(
-                                edge._leaflet_id,
-                                edge._startMarkerId,
-                                edge._endMarkerId,
-                                edge.getLatLngs(),
-                                edge.options
-                            )
-                    );
-                    this.calcStats();
-                } else {
-                    this.resetSegments();
-                }
+                let edges = [];
+                this.trackDrawer.getSteps().map(step => (edges = edges.concat(step.edges)));
+                this.segments = edges.map(
+                    edge =>
+                        new Segment(
+                            edge._leaflet_id,
+                            edge._startMarkerId,
+                            edge._endMarkerId,
+                            edge.getLatLngs(),
+                            edge.options
+                        )
+                );
+                this.calcStats();
             });
         },
         setToolBarMode(mode) {
@@ -203,13 +197,6 @@ export default {
         },
         centerUpdate(center) {
             console.debug('center', center);
-        },
-        resetWaypoints() {
-            this.waypoints = [];
-        },
-        resetSegments() {
-            this.resetStats();
-            this.segments = [];
         },
         resetStats() {
             this.stats = {
