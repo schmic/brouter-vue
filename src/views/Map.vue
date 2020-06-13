@@ -30,6 +30,7 @@
                     <div class="buttons has-addons">
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Create NoGo"
                             :class="{ 'is-success': mapOptions.addNogo }"
                             @click="mapOptions.addNogo = !mapOptions.addNogo"
                         >
@@ -39,6 +40,7 @@
                         </button>
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Split route"
                             :class="{ 'is-success': toolBarMode === 'insert' }"
                             @click="setToolBarMode('insert')"
                         >
@@ -48,6 +50,7 @@
                         </button>
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Change waypoint to sleepover"
                             :class="{ 'is-success': toolBarMode === 'promote' }"
                             @click="setToolBarMode('promote')"
                         >
@@ -57,6 +60,7 @@
                         </button>
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Change sleepover to waypoint"
                             :class="{ 'is-success': toolBarMode === 'demote' }"
                             @click="setToolBarMode('demote')"
                         >
@@ -66,6 +70,7 @@
                         </button>
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Remove waypoint"
                             :class="{ 'is-success': toolBarMode === 'delete' }"
                             @click="setToolBarMode('delete')"
                         >
@@ -75,6 +80,7 @@
                         </button>
                         <button
                             class="button is-small is-dark is-rounded"
+                            title="Add waypoint"
                             :class="{ 'is-success': toolBarMode === 'add' }"
                             @click="setToolBarMode('add')"
                         >
@@ -93,9 +99,9 @@
 import { latLng } from 'leaflet';
 
 import { LMap, LTileLayer, LControl, LControlLayers } from 'vue2-leaflet';
+import { BRouter, TileProviders } from '../util/';
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
-import { BRouter, TileProviders } from '../util/';
 import Waypoint from '@/model/Waypoint';
 import Segment from '@/model/Segment';
 
