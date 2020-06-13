@@ -16,7 +16,6 @@
                 @update:zoom="zoomUpdate"
                 @click="mapClicked"
             >
-                <l-control-layers position="topright" :collapsed="false" :sort-layers="true" />
                 <l-tile-layer
                     v-for="tileProvider in tileProviders"
                     :key="tileProvider.name"
@@ -26,12 +25,12 @@
                     :attribution="tileProvider.attribution"
                     layer-type="base"
                 />
-                <l-control position="topleft">
+                <l-control position="bottomleft">
                     <div class="buttons has-addons">
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Create NoGo"
-                            :class="{ 'is-success': mapOptions.addNogo }"
+                            :class="{ 'is-primary': mapOptions.addNogo }"
                             @click="mapOptions.addNogo = !mapOptions.addNogo"
                         >
                             <span class="icon">
@@ -41,7 +40,7 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Split route"
-                            :class="{ 'is-success': toolBarMode === 'insert' }"
+                            :class="{ 'is-primary': toolBarMode === 'insert' }"
                             @click="setToolBarMode('insert')"
                         >
                             <span class="icon">
@@ -51,7 +50,7 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Change waypoint to sleepover"
-                            :class="{ 'is-success': toolBarMode === 'promote' }"
+                            :class="{ 'is-primary': toolBarMode === 'promote' }"
                             @click="setToolBarMode('promote')"
                         >
                             <span class="icon">
@@ -61,7 +60,7 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Change sleepover to waypoint"
-                            :class="{ 'is-success': toolBarMode === 'demote' }"
+                            :class="{ 'is-primary': toolBarMode === 'demote' }"
                             @click="setToolBarMode('demote')"
                         >
                             <span class="icon">
@@ -71,7 +70,7 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Remove waypoint"
-                            :class="{ 'is-success': toolBarMode === 'delete' }"
+                            :class="{ 'is-primary': toolBarMode === 'delete' }"
                             @click="setToolBarMode('delete')"
                         >
                             <span class="icon">
@@ -81,13 +80,46 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Add waypoint"
-                            :class="{ 'is-success': toolBarMode === 'add' }"
+                            :class="{ 'is-primary': toolBarMode === 'add' }"
                             @click="setToolBarMode('add')"
                         >
                             <span class="icon">
                                 <i class="fa fa-pen"></i>
                             </span>
                         </button>
+                    </div>
+                </l-control>
+                <l-control position="topleft">
+                    <div class="dropdown" :class="{ 'is-active': dropdownActive }">
+                        <div class="dropdown-trigger">
+                            <button
+                                @click="dropdownActive = !dropdownActive"
+                                class="button is-small is-primary"
+                                aria-haspopup="true"
+                                aria-controls="dropdown-menu2"
+                            >
+                                <span>Map</span>
+                                <span class="icon is-small">
+                                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+                            <div class="dropdown-content">
+                                <a
+                                    v-for="tileProvider in tileProviders"
+                                    class="dropdown-item is-small"
+                                    :class="{ 'is-active': tileProvider.visible }"
+                                    :key="tileProvider.id"
+                                    @click="
+                                        setTileprovider(tileProvider);
+                                        dropdownActive = false;
+                                    "
+                                >
+                                    {{ tileProvider.name }}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </l-control>
             </l-map>
@@ -98,7 +130,7 @@
 <script>
 import { latLng } from 'leaflet';
 
-import { LMap, LTileLayer, LControl, LControlLayers } from 'vue2-leaflet';
+import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
 import BRouter from '@/util/BRouter';
 import TileProviders from '@/util/TileProviders';
 import TrackMeta from '@/components/TrackMeta.vue';
@@ -113,11 +145,11 @@ export default {
         WaypointList,
         LMap,
         LTileLayer,
-        LControl,
-        LControlLayers
+        LControl
     },
     data() {
         return {
+            dropdownActive: false,
             trackDrawer: undefined,
             trackDrawerToolBar: undefined,
             trackDrawerOptions: {
@@ -151,6 +183,8 @@ export default {
         // this.$nextTick(() => {
         //     this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
         // });
+        this.zoom = parseInt(localStorage.getItem('map/zoom'));
+        this.center = JSON.parse(localStorage.getItem('map/center'));
     },
     computed: {
         toolBarMode: {
@@ -188,6 +222,13 @@ export default {
                 this.calcStats();
             });
         },
+        setTileprovider(provider) {
+            let x = this.tileProviders.map(p => {
+                if (p.name == provider.name) p.visible = true;
+                else p.visible = false;
+            });
+            console.log('x', x);
+        },
         setToolBarMode(mode) {
             this.toolBarMode = mode == this.toolBarMode ? null : mode;
         },
@@ -200,10 +241,10 @@ export default {
             }
         },
         zoomUpdate(zoom) {
-            console.debug('zoom', zoom);
+            this.zoom = zoom;
         },
         centerUpdate(center) {
-            console.debug('center', center);
+            this.center = center;
         },
         resetStats() {
             this.stats = {
@@ -230,7 +271,16 @@ export default {
             this.stats.descend = this.segments.map(segment => segment.descend).reduce((a, b) => a + b, 0);
         }
     },
-    watch: {}
+    watch: {
+        zoom(zoomOld, zoomNew) {
+            localStorage.setItem('map/zoom', zoomNew);
+            console.log('this.zoom changed', zoomOld, zoomNew);
+        },
+        center(centerOld, centerNew) {
+            localStorage.setItem('map/center', JSON.stringify(centerNew));
+            console.log('this.Center changed', centerOld.toString(), centerNew.toString());
+        }
+    }
 };
 </script>
 
