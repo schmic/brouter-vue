@@ -13,7 +13,7 @@
                 </tr>
                 <tr v-for="(waypoint, index) in waypoints" :key="waypoint.id">
                     <td>
-                        <span> {{ waypoint.id.substring(0, 16) }} </span>
+                        <span> {{ waypoint.name ? waypoint.name.substring(0, 16) : index + 1 }} </span>
                     </td>
                     <td>
                         <span> {{ waypoint.latlng.lat.toFixed(5) }} </span>
