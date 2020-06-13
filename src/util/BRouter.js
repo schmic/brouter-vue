@@ -48,4 +48,4 @@ const BRouter = {
     }
 };
 
-export { BRouter };
+export default BRouter;

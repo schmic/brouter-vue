@@ -99,7 +99,8 @@
 import { latLng } from 'leaflet';
 
 import { LMap, LTileLayer, LControl, LControlLayers } from 'vue2-leaflet';
-import { BRouter, TileProviders } from '../util/';
+import BRouter from '@/util/BRouter';
+import TileProviders from '@/util/TileProviders';
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
 import Waypoint from '@/model/Waypoint';

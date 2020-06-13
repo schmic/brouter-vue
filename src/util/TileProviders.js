@@ -21,4 +21,4 @@ const TileProviders = [
     }
 ];
 
-export { TileProviders };
+export default TileProviders;
