@@ -41,9 +41,25 @@ export default new Vuex.Store({
                         edge.options
                     )
             );
-
             state.segments.length ? statsCalc(state) : statsReset(state);
+        },
+        stateMerge(state, newState) {
+            this.replaceState({ ...state, ...newState });
+        },
+        stateSave(state) {
+            localStorage.setItem('state/waypoints', JSON.stringify(state.waypoints));
         }
     },
-    actions: {}
+    actions: {
+        stateRestore({ commit }) {
+            if (localStorage.getItem('state/waypoints')) {
+                commit('stateMerge', {
+                    waypoints: JSON.parse(localStorage.getItem('state/waypoints'))
+                });
+            }
+        },
+        stateSave({ commit }, triggeredMutation) {
+            triggeredMutation.type == 'waypointsUpdate' && commit('stateSave');
+        }
+    }
 });

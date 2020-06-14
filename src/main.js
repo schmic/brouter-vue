@@ -28,6 +28,10 @@ console.log('[i] Starting client app');
 new Vue({
     router,
     store,
+    beforeCreate() {
+        this.$store.dispatch('stateRestore');
+        this.$store.subscribe(mutation => this.$store.dispatch('stateSave', mutation));
+    },
     render: function(h) {
         return h(App);
     }

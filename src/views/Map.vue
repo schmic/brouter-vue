@@ -200,6 +200,11 @@ export default {
                 this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
                 this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
             });
+            this.$store.state.waypoints.forEach(waypoint => {
+                let marker = window.L.TrackDrawer.node(waypoint.latlng).setType(waypoint.options.type);
+                this.trackDrawerToolBar._bindMarkerEvents(marker);
+                this.trackDrawer.addNode(marker);
+            });
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;
