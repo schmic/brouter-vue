@@ -41,7 +41,7 @@
                             class="button is-small is-dark is-rounded"
                             title="Split route"
                             :class="{ 'is-primary': toolBarMode === 'insert' }"
-                            @click="setToolBarMode('insert')"
+                            @click="toolBarMode = 'insert'"
                         >
                             <span class="icon">
                                 <i class="fa fa-cut"></i>
@@ -51,7 +51,7 @@
                             class="button is-small is-dark is-rounded"
                             title="Change waypoint to sleepover"
                             :class="{ 'is-primary': toolBarMode === 'promote' }"
-                            @click="setToolBarMode('promote')"
+                            @click="toolBarMode = 'promote'"
                         >
                             <span class="icon">
                                 <i class="fa fa-bed"></i>
@@ -61,7 +61,7 @@
                             class="button is-small is-dark is-rounded"
                             title="Change sleepover to waypoint"
                             :class="{ 'is-primary': toolBarMode === 'demote' }"
-                            @click="setToolBarMode('demote')"
+                            @click="toolBarMode = 'demote'"
                         >
                             <span class="icon">
                                 <i class="fa fa-map-signs"></i>
@@ -71,7 +71,7 @@
                             class="button is-small is-dark is-rounded"
                             title="Remove waypoint"
                             :class="{ 'is-primary': toolBarMode === 'delete' }"
-                            @click="setToolBarMode('delete')"
+                            @click="toolBarMode = 'delete'"
                         >
                             <span class="icon">
                                 <i class="fa fa-trash"></i>
@@ -81,7 +81,7 @@
                             class="button is-small is-dark is-rounded"
                             title="Add waypoint"
                             :class="{ 'is-primary': toolBarMode === 'add' }"
-                            @click="setToolBarMode('add')"
+                            @click="toolBarMode = 'add'"
                         >
                             <span class="icon">
                                 <i class="fa fa-pen"></i>
@@ -197,7 +197,7 @@ export default {
                 return this.trackDrawerToolBar && this.trackDrawerToolBar.options.mode;
             },
             set(mode) {
-                return this.trackDrawerToolBar.setMode(mode);
+                this.trackDrawerToolBar.setMode(mode == this.toolBarMode ? null : mode);
             }
         }
     },
@@ -248,9 +248,6 @@ export default {
                 if (p.name == provider.name) p.visible = true;
                 else p.visible = false;
             });
-        },
-        setToolBarMode(mode) {
-            this.toolBarMode = mode == this.toolBarMode ? null : mode;
         },
         statsReset() {
             this.stats = {
