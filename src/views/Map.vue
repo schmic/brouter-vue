@@ -12,8 +12,8 @@
                 :center="center"
                 :options="mapOptions"
                 @ready="onMapReady"
-                @update:center="centerUpdate"
-                @update:zoom="zoomUpdate"
+                @update:center="onMapCenterChanged"
+                @update:zoom="onMapZoomChanged"
                 @click="mapClicked"
             >
                 <l-tile-layer
@@ -164,8 +164,8 @@ export default {
                 editable: true,
                 addNogo: false
             },
-            zoom: 13,
-            center: latLng(49.706256, 8.625321),
+            zoom: 10,
+            center: latLng(49.73868, 8.62084),
             waypoints: [],
             segments: [],
             nogos: [],
@@ -179,12 +179,17 @@ export default {
             }
         };
     },
+    created() {
+        let defaultZoom = JSON.stringify(this.zoom);
+        this.zoom = parseInt(localStorage.getItem('map/zoom') || defaultZoom);
+
+        let defaultCenter = JSON.stringify(this.center);
+        this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
+    },
     mounted() {
         // this.$nextTick(() => {
         //     this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
         // });
-        this.zoom = parseInt(localStorage.getItem('map/zoom'));
-        this.center = JSON.parse(localStorage.getItem('map/center'));
     },
     computed: {
         toolBarMode: {
@@ -222,12 +227,19 @@ export default {
                 this.calcStats();
             });
         },
+        onMapZoomChanged(zoom) {
+            this.zoom = zoom;
+            localStorage.setItem('map/zoom', zoom);
+        },
+        onMapCenterChanged(center) {
+            this.center = center;
+            localStorage.setItem('map/center', JSON.stringify(center));
+        },
         setTileprovider(provider) {
-            let x = this.tileProviders.map(p => {
+            this.tileProviders.forEach(p => {
                 if (p.name == provider.name) p.visible = true;
                 else p.visible = false;
             });
-            console.log('x', x);
         },
         setToolBarMode(mode) {
             this.toolBarMode = mode == this.toolBarMode ? null : mode;
@@ -239,12 +251,6 @@ export default {
                 nogo.enableEdit();
                 nogo.on('dblclick', window.L.DomEvent.stop).on('dblclick', nogo.toggleEdit);
             }
-        },
-        zoomUpdate(zoom) {
-            this.zoom = zoom;
-        },
-        centerUpdate(center) {
-            this.center = center;
         },
         resetStats() {
             this.stats = {
@@ -271,16 +277,7 @@ export default {
             this.stats.descend = this.segments.map(segment => segment.descend).reduce((a, b) => a + b, 0);
         }
     },
-    watch: {
-        zoom(zoomOld, zoomNew) {
-            localStorage.setItem('map/zoom', zoomNew);
-            console.log('this.zoom changed', zoomOld, zoomNew);
-        },
-        center(centerOld, centerNew) {
-            localStorage.setItem('map/center', JSON.stringify(centerNew));
-            console.log('this.Center changed', centerOld.toString(), centerNew.toString());
-        }
-    }
+    watch: {}
 };
 </script>
 
