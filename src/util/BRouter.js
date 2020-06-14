@@ -39,7 +39,6 @@ async function getRouteSegment(from, to) {
     )},${to.lat.toFixed(6)}`;
 
     let url = `${baseURL}&lonlats=${lonlats}&nogos=${nogos}`;
-    console.log('url', url);
 
     let response = await fetch(url);
     let data = await response.json();
