@@ -3,7 +3,7 @@
         <nav class="navbar is-primary">
             <div class="navbar-brand">
                 <router-link class="navbar-item" to="/">
-                    BRouter-Vue <small style="margin-left: 1em">v{{ version }}</small></router-link
+                    BRouter-Vue <small style="margin-left: 0.5em">v{{ version }}</small></router-link
                 >
 
                 <a class="navbar-item is-hidden-desktop" href="https://github.com/schmic/brouter-vue" target="_blank">
