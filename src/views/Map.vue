@@ -14,7 +14,7 @@
                 @ready="onMapReady"
                 @update:center="onMapCenterChanged"
                 @update:zoom="onMapZoomChanged"
-                @click="mapClicked"
+                @click="onMapClicked"
             >
                 <l-tile-layer
                     v-for="tileProvider in tileProviders"
@@ -224,7 +224,7 @@ export default {
                             edge.options
                         )
                 );
-                this.calcStats();
+                this.statsCalc();
             });
         },
         onMapZoomChanged(zoom) {
@@ -235,6 +235,14 @@ export default {
             this.center = center;
             localStorage.setItem('map/center', JSON.stringify(center));
         },
+        onMapClicked(evt) {
+            if (this.mapOptions.addNogo) {
+                this.mapOptions.addNogo = false;
+                var nogo = window.L.circle(evt.latlng, { radius: 500 }).addTo(this.$refs.map.mapObject);
+                nogo.enableEdit();
+                nogo.on('dblclick', window.L.DomEvent.stop).on('dblclick', nogo.toggleEdit);
+            }
+        },
         setTileprovider(provider) {
             this.tileProviders.forEach(p => {
                 if (p.name == provider.name) p.visible = true;
@@ -244,15 +252,7 @@ export default {
         setToolBarMode(mode) {
             this.toolBarMode = mode == this.toolBarMode ? null : mode;
         },
-        mapClicked(evt) {
-            if (this.mapOptions.addNogo) {
-                this.mapOptions.addNogo = false;
-                var nogo = window.L.circle(evt.latlng, { radius: 500 }).addTo(this.$refs.map.mapObject);
-                nogo.enableEdit();
-                nogo.on('dblclick', window.L.DomEvent.stop).on('dblclick', nogo.toggleEdit);
-            }
-        },
-        resetStats() {
+        statsReset() {
             this.stats = {
                 distance: 0,
                 totaltime: 0,
@@ -261,9 +261,9 @@ export default {
                 descend: 0
             };
         },
-        calcStats() {
+        statsCalc() {
             if (this.segments.length <= 0) {
-                this.resetStats();
+                this.statsReset();
                 return;
             }
 
