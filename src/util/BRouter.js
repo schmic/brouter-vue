@@ -1,13 +1,15 @@
 // HINT: URL example for the BRouter backend
 // => /brouter?lonlats=1.1,1.2|2.1,2.2|3.1,3.2|4.1,4.2&nogos=-1.1,-1.2,1|-2.1,-2.2,2&profile=shortest&alternativeidx=1&format=kml
 
-// const settings = {
-//     URL_TEMPLATE:
-//         '/brouter?lonlats={lonlats}&nogos={nogos}&polylines={polylines}&polygons={polygons}&profile={profile}&alternativeidx={alternativeidx}&format={format}',
-//     PRECISION: 6,
-//     NUMBER_SEPARATOR: ',',
-//     GROUP_SEPARATOR: '|'
-// };
+const settings = {
+    //     URL_TEMPLATE:
+    //         '/brouter?lonlats={lonlats}&nogos={nogos}&polylines={polylines}&polygons={polygons}&profile={profile}&alternativeidx={alternativeidx}&format={format}',
+    PRECISION: 6
+    //     NUMBER_SEPARATOR: ',',
+    //     GROUP_SEPARATOR: '|'
+};
+
+import store from '@/store';
 
 async function getRouteSegment(from, to) {
     // TODO: get current (custom) profile
@@ -24,7 +26,20 @@ async function getRouteSegment(from, to) {
         `${urlPrefix}${urlBackendPath}?` +
         [`profile=${profile}`, `alternativeidx=${alternativeidx}`, `format=${format}`].join('&');
 
-    let url = `${baseURL}&lonlats=${from.lng},${from.lat}|${to.lng},${to.lat}`;
+    let nogos = store.state.nogos
+        .map(nogo => {
+            return `${nogo.latlng.lng.toFixed(settings.PRECISION)},${nogo.latlng.lat.toFixed(
+                settings.PRECISION
+            )},${nogo.radius.toFixed(0)}`;
+        })
+        .join('|');
+
+    let lonlats = `${from.lng.toFixed(settings.PRECISION)},${from.lat.toFixed(settings.PRECISION)}|${to.lng.toFixed(
+        settings.PRECISION
+    )},${to.lat.toFixed(6)}`;
+
+    let url = `${baseURL}&lonlats=${lonlats}&nogos=${nogos}`;
+    console.log('url', url);
 
     let response = await fetch(url);
     let data = await response.json();
@@ -35,11 +50,7 @@ const BRouter = {
     route(markerStart, markerEnd, done) {
         getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng())
             .then(data => {
-                done(
-                    null,
-                    // data.features[0].geometry.coordinates.map(c => [c[1], c[0], c[2]]), // convert, urgh!
-                    data
-                );
+                done(null, data);
             })
             .catch(error => {
                 done(error);
