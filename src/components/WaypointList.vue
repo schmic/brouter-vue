@@ -21,9 +21,6 @@
                     <td>
                         <span> {{ waypoint.latlng.lng.toFixed(5) }} </span>
                     </td>
-                    <td>
-                        <i class="fas fa-trash" @click="markerClicked(index)"> </i>
-                    </td>
                 </tr>
             </table>
         </div>
@@ -32,10 +29,9 @@
 
 <script>
 export default {
-    props: ['waypoints'],
-    methods: {
-        markerClicked(index) {
-            this.waypoints.splice(index, 1);
+    computed: {
+        waypoints() {
+            return this.$store.state.waypoints;
         }
     }
 };

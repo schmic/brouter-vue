@@ -1,8 +1,8 @@
 <template>
     <div class="columns is-mobile">
         <div class="column is-one-quarter">
-            <track-meta :track-stats="stats"></track-meta>
-            <waypoint-list :waypoints="waypoints"></waypoint-list>
+            <track-meta></track-meta>
+            <waypoint-list></waypoint-list>
         </div>
         <div class="column">
             <l-map
@@ -135,8 +135,8 @@ import BRouter from '@/util/BRouter';
 import TileProviders from '@/util/TileProviders';
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
-import Waypoint from '@/model/Waypoint';
-import Segment from '@/model/Segment';
+// import Waypoint from '@/model/Waypoint';
+// import Segment from '@/model/Segment';
 
 export default {
     name: 'Map',
@@ -166,17 +166,8 @@ export default {
             },
             zoom: 10,
             center: latLng(49.73868, 8.62084),
-            waypoints: [],
-            segments: [],
             nogos: [],
-            pois: [],
-            stats: {
-                distance: 0,
-                totaltime: 0,
-                formattedtime: '0:00',
-                ascend: 0,
-                descend: 0
-            }
+            pois: []
         };
     },
     created() {
@@ -206,25 +197,8 @@ export default {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
             this.trackDrawer.on('TrackDrawer:done', () => {
-                let markers = [];
-                this.trackDrawer.getNodes().map(node => (markers = markers.concat(node.markers)));
-                this.waypoints = markers.map(
-                    marker => new Waypoint(marker._leaflet_id, undefined, marker._latlng, marker.options)
-                );
-
-                let edges = [];
-                this.trackDrawer.getSteps().map(step => (edges = edges.concat(step.edges)));
-                this.segments = edges.map(
-                    edge =>
-                        new Segment(
-                            edge._leaflet_id,
-                            edge._startMarkerId,
-                            edge._endMarkerId,
-                            edge.getLatLngs(),
-                            edge.options
-                        )
-                );
-                this.statsCalc();
+                this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
+                this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
             });
         },
         onMapZoomChanged(zoom) {
@@ -248,30 +222,6 @@ export default {
                 if (p.name == provider.name) p.visible = true;
                 else p.visible = false;
             });
-        },
-        statsReset() {
-            this.stats = {
-                distance: 0,
-                totaltime: 0,
-                formattedtime: '0:00',
-                ascend: 0,
-                descend: 0
-            };
-        },
-        statsCalc() {
-            if (this.segments.length <= 0) {
-                this.statsReset();
-                return;
-            }
-
-            this.stats.distance = this.segments.map(segment => segment.distance).reduce((a, b) => a + b, 0);
-            this.stats.totaltime = this.segments.map(segment => segment.duration).reduce((a, b) => a + b, 0);
-            this.stats.formattedtime =
-                Math.trunc(this.stats.totaltime / 3600) +
-                ':' +
-                ('0' + Math.trunc((this.stats.totaltime % 3600) / 60)).slice(-2);
-            this.stats.ascend = this.segments.map(segment => segment.ascend).reduce((a, b) => a + b, 0);
-            this.stats.descend = this.segments.map(segment => segment.descend).reduce((a, b) => a + b, 0);
         }
     },
     watch: {}

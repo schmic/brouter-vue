@@ -25,7 +25,11 @@
 
 <script>
 export default {
-    props: ['trackStats']
+    computed: {
+        trackStats() {
+            return this.$store.state.stats;
+        }
+    }
 };
 </script>
 
