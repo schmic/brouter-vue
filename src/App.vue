@@ -2,7 +2,10 @@
     <div id="app">
         <nav class="navbar is-primary">
             <div class="navbar-brand">
-                <router-link class="navbar-item" to="/"> BRouter-Vue</router-link>
+                <router-link class="navbar-item" to="/">
+                    BRouter-Vue <small style="margin-left: 1em">v{{ version }}</small></router-link
+                >
+
                 <a class="navbar-item is-hidden-desktop" href="https://github.com/schmic/brouter-vue" target="_blank">
                     <span class="icon" style="color: #333;">
                         <i class="fab fa-github"></i>
@@ -91,6 +94,16 @@
     </div>
 </template>
 
+<script>
+import { version } from '../package.json';
+export default {
+    data() {
+        return {
+            version: version
+        };
+    }
+};
+</script>
 <style>
 html,
 body {
