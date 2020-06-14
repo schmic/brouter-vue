@@ -135,8 +135,6 @@ import BRouter from '@/util/BRouter';
 import TileProviders from '@/util/TileProviders';
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
-// import Waypoint from '@/model/Waypoint';
-// import Segment from '@/model/Segment';
 
 export default {
     name: 'Map',
@@ -205,6 +203,28 @@ export default {
                 this.trackDrawerToolBar._bindMarkerEvents(marker);
                 this.trackDrawer.addNode(marker);
             });
+            this.$store.state.nogos.forEach(nogo => {
+                // TODO: remove duplicate code for nogo creation
+                nogo = window.L.circle(nogo.latlng, { radius: nogo.radius });
+                nogo.addTo(this.$refs.map.mapObject)
+                    .on('dblclick', evt => {
+                        window.L.DomEvent.stop(evt);
+                        evt.target.toggleEdit();
+                    })
+                    .on('click', evt => {
+                        window.L.DomEvent.stop(evt);
+                        if (this.toolBarMode == 'delete') {
+                            evt.target.remove();
+                            this.$store.commit('nogoRemove', evt.target);
+                        }
+                    })
+                    .on('editable:editing', evt => {
+                        window.L.DomEvent.stop(evt);
+                        this.$store.commit('nogoUpdate', evt.target);
+                    })
+                    .enableEdit();
+                this.$store.commit('nogoUpdate', nogo);
+            });
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;
@@ -217,9 +237,26 @@ export default {
         onMapClicked(evt) {
             if (this.mapOptions.addNogo) {
                 this.mapOptions.addNogo = false;
-                var nogo = window.L.circle(evt.latlng, { radius: 500 }).addTo(this.$refs.map.mapObject);
-                nogo.enableEdit();
-                nogo.on('dblclick', window.L.DomEvent.stop).on('dblclick', nogo.toggleEdit);
+                // TODO: remove duplicate code for nogo creation
+                let nogo = window.L.circle(evt.latlng, { radius: 1000 });
+                nogo.addTo(this.$refs.map.mapObject)
+                    .on('dblclick', evt => {
+                        window.L.DomEvent.stop(evt);
+                        evt.target.toggleEdit();
+                    })
+                    .on('click', evt => {
+                        window.L.DomEvent.stop(evt);
+                        if (this.toolBarMode == 'delete') {
+                            evt.target.remove();
+                            this.$store.commit('nogoRemove', evt.target);
+                        }
+                    })
+                    .on('editable:editing', evt => {
+                        window.L.DomEvent.stop(evt);
+                        this.$store.commit('nogoUpdate', evt.target);
+                    })
+                    .enableEdit();
+                this.$store.commit('nogoUpdate', nogo);
             }
         },
         setTileprovider(provider) {

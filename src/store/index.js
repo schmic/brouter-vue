@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
 import Waypoint from '@/model/Waypoint';
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     state: {
         waypoints: [],
         segments: [],
+        nogos: [],
         stats: {
             distance: 0,
             totaltime: 0,
@@ -21,11 +23,19 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        nogoUpdate(state, nogo) {
+            nogo = new NoGo(nogo);
+            state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo)).concat([nogo]);
+        },
+        nogoRemove(state, nogo) {
+            nogo = new NoGo(nogo);
+            state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo));
+        },
         waypointsUpdate(state, trackDrawerNodes) {
             let markers = [];
             trackDrawerNodes.map(node => (markers = markers.concat(node.markers)));
             state.waypoints = markers.map(
-                marker => new Waypoint(marker._leaflet_id, undefined, marker._latlng, marker.options)
+                marker => new Waypoint(marker._leaflet_id, undefined, marker.getLatLng(), marker.options)
             );
         },
         segmentsUpdate(state, trackDrawerSteps) {
@@ -48,18 +58,21 @@ export default new Vuex.Store({
         },
         stateSave(state) {
             localStorage.setItem('state/waypoints', JSON.stringify(state.waypoints));
+            localStorage.setItem('state/nogos', JSON.stringify(state.nogos));
         }
     },
     actions: {
         stateRestore({ commit }) {
             if (localStorage.getItem('state/waypoints')) {
                 commit('stateMerge', {
-                    waypoints: JSON.parse(localStorage.getItem('state/waypoints'))
+                    waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
+                    nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]')
                 });
             }
         },
         stateSave({ commit }, triggeredMutation) {
             triggeredMutation.type == 'waypointsUpdate' && commit('stateSave');
+            triggeredMutation.type == 'nogoUpdate' && commit('stateSave');
         }
     }
 });
