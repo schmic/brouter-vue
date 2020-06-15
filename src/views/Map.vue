@@ -29,7 +29,7 @@
                     <div class="buttons has-addons">
                         <button
                             class="button is-small is-dark is-rounded"
-                            title="Create NoGo"
+                            title="Add NoGo area"
                             :class="{ 'is-primary': mapOptions.addNogo }"
                             @click="mapOptions.addNogo = !mapOptions.addNogo"
                         >
@@ -204,25 +204,7 @@ export default {
                 this.trackDrawer.addNode(marker);
             });
             this.$store.state.nogos.forEach(nogo => {
-                // TODO: remove duplicate code for nogo creation
-                nogo = window.L.circle(nogo.latlng, { radius: nogo.radius });
-                nogo.addTo(this.$refs.map.mapObject)
-                    .on('dblclick', evt => {
-                        window.L.DomEvent.stop(evt);
-                        evt.target.toggleEdit();
-                    })
-                    .on('click', evt => {
-                        window.L.DomEvent.stop(evt);
-                        if (this.toolBarMode == 'delete') {
-                            evt.target.remove();
-                            this.$store.commit('nogoRemove', evt.target);
-                        }
-                    })
-                    .on('editable:editing', evt => {
-                        window.L.DomEvent.stop(evt);
-                        this.$store.commit('nogoUpdate', evt.target);
-                    })
-                    .enableEdit();
+                nogo = this._createNoGo(nogo.latlng, { radius: nogo.radius }, this.$refs.map.mapObject);
                 this.$store.commit('nogoUpdate', nogo);
             });
         },
@@ -237,25 +219,7 @@ export default {
         onMapClicked(evt) {
             if (this.mapOptions.addNogo) {
                 this.mapOptions.addNogo = false;
-                // TODO: remove duplicate code for nogo creation
-                let nogo = window.L.circle(evt.latlng, { radius: 1000 });
-                nogo.addTo(this.$refs.map.mapObject)
-                    .on('dblclick', evt => {
-                        window.L.DomEvent.stop(evt);
-                        evt.target.toggleEdit();
-                    })
-                    .on('click', evt => {
-                        window.L.DomEvent.stop(evt);
-                        if (this.toolBarMode == 'delete') {
-                            evt.target.remove();
-                            this.$store.commit('nogoRemove', evt.target);
-                        }
-                    })
-                    .on('editable:editing', evt => {
-                        window.L.DomEvent.stop(evt);
-                        this.$store.commit('nogoUpdate', evt.target);
-                    })
-                    .enableEdit();
+                let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, this.$refs.map.mapObject);
                 this.$store.commit('nogoUpdate', nogo);
             }
         },
@@ -264,6 +228,30 @@ export default {
                 if (p.name == provider.name) p.visible = true;
                 else p.visible = false;
             });
+        },
+        _createNoGo(latlng, options, map) {
+            let nogo = window.L.circle(latlng, options);
+            return nogo
+                .addTo(map)
+                .on('dblclick', evt => {
+                    window.L.DomEvent.stop(evt);
+                })
+                .on('click', evt => {
+                    window.L.DomEvent.stop(evt);
+                    if (this.toolBarMode == 'delete') {
+                        evt.target.remove();
+                        this.$store.commit('nogoRemove', evt.target);
+                    } else {
+                        evt.target.toggleEdit();
+                        if (evt.target.editEnabled()) {
+                            evt.target.setStyle({ color: 'darkred' });
+                        } else {
+                            evt.target.setStyle({ color: '#3388ff' });
+                            this.$store.commit('nogoUpdate', evt.target);
+                            this.trackDrawer.refreshEdges();
+                        }
+                    }
+                });
         }
     },
     watch: {}
