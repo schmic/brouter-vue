@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { version } from '../../package.json';
+
 import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
 import Waypoint from '@/model/Waypoint';
@@ -66,6 +68,14 @@ export default new Vuex.Store({
     },
     actions: {
         stateRestore({ commit }) {
+            let storageVersion = localStorage.getItem('state/version') || version;
+
+            if (version !== storageVersion) {
+                // migrate storage
+            } else {
+                console.log(`Storage version ${version} verified`);
+            }
+
             if (localStorage.getItem('state/waypoints')) {
                 commit('stateMerge', {
                     waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
