@@ -46,7 +46,7 @@
                                     class="dropdown-item is-small"
                                     @click="
                                         dropDown.menu = false;
-                                        clearEverything();
+                                        onRouteClear();
                                     "
                                 >
                                     Clear Everything
@@ -244,6 +244,8 @@ export default {
                 this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
                 this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
             });
+
+            // import
             this.$store.state.waypoints.forEach(waypoint => {
                 let marker = window.L.TrackDrawer.node(waypoint.latlng).setType(waypoint.options.type);
                 this.trackDrawerToolBar._bindMarkerEvents(marker);
@@ -276,7 +278,10 @@ export default {
                 else p.visible = false;
             });
         },
-        clearEverything() {},
+        onRouteClear() {
+            this.$store.dispatch('routeClear');
+            location.reload();
+        },
         _createNoGo(latlng, options, map) {
             let nogo = window.L.circle(latlng, options);
             return nogo
