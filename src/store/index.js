@@ -31,6 +31,9 @@ export default new Vuex.Store({
             nogo = new NoGo(nogo);
             state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo));
         },
+        nogosUpdate(state, nogos) {
+            state.nogos = nogos.map(nogo => new NoGo(nogo));
+        },
         waypointsUpdate(state, trackDrawerNodes) {
             let markers = [];
             trackDrawerNodes.map(node => (markers = markers.concat(node.markers)));
@@ -73,6 +76,16 @@ export default new Vuex.Store({
         stateSave({ commit }, triggeredMutation) {
             triggeredMutation.type.startsWith('waypoint') && commit('stateSave');
             triggeredMutation.type.startsWith('nogo') && commit('stateSave');
+        },
+        waypointsClear({ commit }) {
+            commit('waypointsUpdate', []);
+        },
+        nogosClear({ commit }) {
+            commit('nogosUpdate', []);
+        },
+        routeClear({ dispatch }) {
+            dispatch('waypointsClear', []);
+            dispatch('nogosClear', []);
         }
     }
 });
