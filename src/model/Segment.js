@@ -1,5 +1,5 @@
 export default class Segment {
-    constructor(id, from, to, latlngs, options, original) {
+    constructor(id, from, to, latlngs, options) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -10,7 +10,6 @@ export default class Segment {
         this.distance = parseInt(this.options.properties['track-length']);
 
         this._calcAscendDescend();
-        this._handleOriginal(original);
     }
 
     _calcAscendDescend() {
@@ -30,11 +29,6 @@ export default class Segment {
 
         this.ascend = parseInt(this.ascend);
         this.descend = parseInt(this.descend);
-    }
-
-    _handleOriginal(original) {
-        this.original = original;
-        original && console.log('original', original);
     }
 
     toString() {

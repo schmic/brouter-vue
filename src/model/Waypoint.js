@@ -1,7 +1,5 @@
 export default class Waypoint {
     constructor(id, name, latlng, options, original) {
-        // console.log('id, latlng, options', id, latlng, options);
-
         this.id = id;
         this.name = name;
         this.latlng = latlng;
