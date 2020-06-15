@@ -14,7 +14,6 @@ import store from '@/store';
 async function getRouteSegment(from, to) {
     // TODO: get current (custom) profile
     // TODO: get current alternative route
-    // TODO: take NoGo areas into account
 
     const profile = 'fastbike';
     const alternativeidx = 0;
