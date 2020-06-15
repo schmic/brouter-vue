@@ -46,46 +46,6 @@ function buildUrl(lonlats, nogos) {
     return url;
 }
 
-function getRouteUrl(lonlats, nogos) {
-    let url = buildUrl(lonlats, nogos);
-    return btoa(url.split('?')[1]);
-}
-
-function readRouteUrl(routeStr) {
-    let url = atob(routeStr);
-    let parts = {};
-    url.split('&').forEach(part => {
-        let key = part.split('=')[0];
-        let values = part.split('=')[1];
-        switch (key) {
-            case 'lonlats':
-                // need to convert from lng,lat to lat,lng
-                parts['latlngs'] = values.split('|').map(value => {
-                    return {
-                        lat: parseFloat(value.split(',')[1]),
-                        lng: parseFloat(value.split(',')[0])
-                    };
-                });
-                break;
-            case 'nogos':
-                parts[key] = values.split('|').map(value => {
-                    value = value.split(',');
-                    return {
-                        radius: parseFloat(value[2]),
-                        latlng: {
-                            lat: parseFloat(value[1]),
-                            lng: parseFloat(value[0])
-                        }
-                    };
-                });
-                break;
-            default:
-                parts[key] = values;
-        }
-    });
-    return parts;
-}
-
 async function getRouteSegment(from, to) {
     let nogos = store.state.nogos;
     let url = buildUrl([from, to], nogos);
@@ -107,10 +67,8 @@ function route(markerStart, markerEnd, done) {
 }
 
 const BRouter = {
-    route,
-    getRouteSegment,
-    getRouteUrl
+    route
 };
 
 export default BRouter;
-export { route, buildUrl, getRouteUrl, readRouteUrl };
+export { route, buildUrl }; // make testable

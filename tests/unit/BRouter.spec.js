@@ -1,4 +1,4 @@
-import { buildUrl, getRouteUrl, readRouteUrl } from '@/util/BRouter';
+import { buildUrl } from '@/util/BRouter';
 import store from '@/store';
 import stateMock from '../state.mock';
 
@@ -34,26 +34,5 @@ describe('BRouter', () => {
         let fetchURL = buildUrl([from.latlng, to.latlng], nogos);
         expect(fetchURL).toContain(url.parts.lonlats);
         expect(fetchURL).toContain(url.parts.nogos);
-    });
-
-    it('get shared URL', () => {
-        let from = store.state.waypoints[0];
-        let to = store.state.waypoints[1];
-        let nogos = store.state.nogos;
-        let fetchURL = getRouteUrl([from.latlng, to.latlng], nogos);
-        expect(fetchURL).toMatch(url.parts.shared);
-    });
-
-    it('read shared URL', () => {
-        let route = readRouteUrl(url.parts.shared);
-        expect(route).toMatchObject({ format: 'geojson' });
-        expect(route).toMatchObject({ alternativeidx: '0' });
-        expect(route).toMatchObject({
-            nogos: store.state.nogos.map(nogo => {
-                delete nogo.id;
-                delete nogo.name;
-                return nogo;
-            })
-        });
     });
 });
