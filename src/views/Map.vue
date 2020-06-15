@@ -8,7 +8,7 @@
         <div class="column">
             <l-map
                 ref="map"
-                :style="{ cursor: mapOptions.addWaypoint || mapOptions.addNogo ? 'crosshair' : 'default' }"
+                :style="{ cursor: toolBarMode != undefined ? 'crosshair' : 'default' }"
                 :zoom="zoom"
                 :center="center"
                 :options="mapOptions"
@@ -88,7 +88,7 @@
                 </l-control>
                 <l-control position="topright"> </l-control>
                 <l-control position="bottomleft">
-                    <div class="buttons has-addons">
+                    <div class="buttons has-addons" v-shortkey="['esc']" @shortkey="toolBarMode = undefined">
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Remove something (d)"
@@ -104,10 +104,10 @@
                         <button
                             class="button is-small is-dark is-rounded"
                             title="Add NoGo area (n)"
-                            :class="{ 'is-primary': mapOptions.addNogo }"
+                            :class="{ 'is-primary': toolBarMode === 'nogo' }"
                             v-shortkey="['n']"
-                            @shortkey="mapOptions.addNogo = !mapOptions.addNogo"
-                            @click="mapOptions.addNogo = !mapOptions.addNogo"
+                            @shortkey="toolBarMode = 'nogo'"
+                            @click="toolBarMode = 'nogo'"
                         >
                             <span class="icon">
                                 <i class="fa fa-ban"></i>
@@ -153,9 +153,9 @@
                             class="button is-small is-dark is-rounded"
                             title="Add waypoint (w)"
                             :class="{ 'is-primary': toolBarMode === 'add' }"
-                            @click="toolBarMode = 'add'"
                             v-shortkey="['w']"
                             @shortkey="toolBarMode = 'add'"
+                            @click="toolBarMode = 'add'"
                         >
                             <span class="icon">
                                 <i class="fa fa-pen"></i>
@@ -205,8 +205,7 @@ export default {
                 zoomControl: false,
                 attributionControl: true,
                 zoomSnap: 0.5,
-                editable: true,
-                addNogo: false
+                editable: true
             },
             zoom: 10,
             center: latLng(49.73868, 8.62084),
@@ -265,8 +264,8 @@ export default {
             localStorage.setItem('map/center', JSON.stringify(center));
         },
         onMapClicked(evt) {
-            if (this.mapOptions.addNogo) {
-                this.mapOptions.addNogo = false;
+            if (this.toolBarMode === 'nogo') {
+                this.toolBarMode = undefined;
                 let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, this.$refs.map.mapObject);
                 this.$store.commit('nogoUpdate', nogo);
                 this.trackDrawer.refreshEdges();
