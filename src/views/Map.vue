@@ -221,6 +221,7 @@ export default {
                 this.mapOptions.addNogo = false;
                 let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, this.$refs.map.mapObject);
                 this.$store.commit('nogoUpdate', nogo);
+                this.trackDrawer.refreshEdges();
             }
         },
         setTileprovider(provider) {
