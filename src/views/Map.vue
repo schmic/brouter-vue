@@ -1,6 +1,6 @@
 <template>
     <div class="columns is-mobile">
-        <div class="column is-one-quarter">
+        <div class="column is-one-quarter" v-if="showSidebar">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <waypoint-list></waypoint-list>
@@ -27,6 +27,17 @@
                     layer-type="base"
                 />
                 <l-control position="topleft">
+                    <button
+                        class="button is-small is-primary"
+                        @click="
+                            showSidebar = !showSidebar;
+                            $refs.map.mapObject._onResize();
+                        "
+                    >
+                        <span class="icon is-small">
+                            <i class="fa" :class="showSidebar ? 'fa-angle-left' : 'fa-angle-right'"></i>
+                        </span>
+                    </button>
                     <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
                         <div class="dropdown-trigger">
                             <button
@@ -90,7 +101,7 @@
                 <l-control position="bottomleft">
                     <div class="buttons has-addons" v-shortkey="['esc']" @shortkey="toolBarMode = undefined">
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Remove something (d)"
                             :class="{ 'is-primary': toolBarMode === 'delete' }"
                             v-shortkey="['x']"
@@ -102,7 +113,7 @@
                             </span>
                         </button>
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Add NoGo area (n)"
                             :class="{ 'is-primary': toolBarMode === 'nogo' }"
                             v-shortkey="['n']"
@@ -114,7 +125,7 @@
                             </span>
                         </button>
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Split route (s)"
                             :class="{ 'is-primary': toolBarMode === 'insert' }"
                             v-shortkey="['s']"
@@ -126,7 +137,7 @@
                             </span>
                         </button>
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Change waypoint to sleepover (o)"
                             :class="{ 'is-primary': toolBarMode === 'promote' }"
                             v-shortkey="['o']"
@@ -138,7 +149,7 @@
                             </span>
                         </button>
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Change sleepover to waypoint (Shift+o)"
                             :class="{ 'is-primary': toolBarMode === 'demote' }"
                             v-shortkey="['shift', 'o']"
@@ -150,7 +161,7 @@
                             </span>
                         </button>
                         <button
-                            class="button is-small is-dark is-rounded"
+                            class="button is-dark is-rounded"
                             title="Add waypoint (w)"
                             :class="{ 'is-primary': toolBarMode === 'add' }"
                             v-shortkey="['w']"
@@ -194,6 +205,7 @@ export default {
                 tileProvider: false,
                 menu: false
             },
+            showSidebar: true,
             trackDrawer: undefined,
             trackDrawerToolBar: undefined,
             trackDrawerOptions: {
