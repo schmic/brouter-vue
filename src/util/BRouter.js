@@ -11,7 +11,7 @@ const settings = {
 
 import store from '@/store';
 
-async function getRouteSegment(from, to) {
+function buildUrl(lonlats, nogos) {
     // TODO: get current (custom) profile
     // TODO: get current alternative route
 
@@ -21,40 +21,58 @@ async function getRouteSegment(from, to) {
 
     let urlPrefix = location.hostname == 'localhost' ? 'http://localhost:17777' : '';
     let urlBackendPath = `/brouter`;
-    let baseURL =
-        `${urlPrefix}${urlBackendPath}?` +
-        [`profile=${profile}`, `alternativeidx=${alternativeidx}`, `format=${format}`].join('&');
+    let url = `${urlPrefix}${urlBackendPath}`;
 
-    let nogos = store.state.nogos
+    url += `?profile=${profile}`;
+    url += `&alternativeidx=${alternativeidx}`;
+    url += `&format=${format}`;
+
+    nogos = (nogos || [])
         .map(nogo => {
             return `${nogo.latlng.lng.toFixed(settings.PRECISION)},${nogo.latlng.lat.toFixed(
                 settings.PRECISION
             )},${nogo.radius.toFixed(0)}`;
         })
         .join('|');
+    if (nogos) url += `&nogos=${nogos}`;
 
-    let lonlats = `${from.lng.toFixed(settings.PRECISION)},${from.lat.toFixed(settings.PRECISION)}|${to.lng.toFixed(
-        settings.PRECISION
-    )},${to.lat.toFixed(6)}`;
+    lonlats = (lonlats || [])
+        .map(lonlat => {
+            return `${lonlat.lng.toFixed(settings.PRECISION)},${lonlat.lat.toFixed(settings.PRECISION)}`;
+        })
+        .join('|');
+    if (lonlats) url += `&lonlats=${lonlats}`;
 
-    let url = `${baseURL}&lonlats=${lonlats}&nogos=${nogos}`;
+    return url;
+}
+
+function getRouteUrl() {}
+
+async function getRouteSegment(from, to) {
+    let nogos = store.state.nogos;
+    let url = buildUrl([from, to], nogos);
 
     let response = await fetch(url);
     let data = await response.json();
     return data;
 }
 
+function route(markerStart, markerEnd, done) {
+    getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng())
+        .then(data => {
+            done(null, data);
+        })
+        .catch(error => {
+            done(error);
+            console.log('fetch.error', error);
+        });
+}
+
 const BRouter = {
-    route(markerStart, markerEnd, done) {
-        getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng())
-            .then(data => {
-                done(null, data);
-            })
-            .catch(error => {
-                done(error);
-                console.log('fetch.error', error);
-            });
-    }
+    route,
+    getRouteSegment,
+    getRouteUrl
 };
 
 export default BRouter;
+export { route, buildUrl, getRouteUrl };
