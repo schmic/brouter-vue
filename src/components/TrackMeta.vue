@@ -1,10 +1,10 @@
 <template>
-    <article class="message is-grey">
+    <article class="message is-dark">
         <div class="message-header">
             Statistic
         </div>
         <div class="message-body">
-            <nav class="level is-mobile">
+            <nav class="level">
                 <div class="level-item has-text-centered">
                     <i class="fa fa-route"></i>
                     {{ (trackStats.distance / 1000).toFixed(2) }} km

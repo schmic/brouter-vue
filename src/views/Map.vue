@@ -1,6 +1,7 @@
 <template>
     <div class="columns is-mobile">
         <div class="column is-one-quarter">
+            <route-meta></route-meta>
             <track-meta></track-meta>
             <waypoint-list></waypoint-list>
         </div>
@@ -25,78 +26,41 @@
                     :attribution="tileProvider.attribution"
                     layer-type="base"
                 />
-                <l-control position="bottomleft">
-                    <div class="buttons has-addons">
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Add NoGo area"
-                            :class="{ 'is-primary': mapOptions.addNogo }"
-                            @click="mapOptions.addNogo = !mapOptions.addNogo"
-                        >
-                            <span class="icon">
-                                <i class="far fa-circle"></i>
-                            </span>
-                        </button>
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Split route"
-                            :class="{ 'is-primary': toolBarMode === 'insert' }"
-                            @click="toolBarMode = 'insert'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-cut"></i>
-                            </span>
-                        </button>
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Change waypoint to sleepover"
-                            :class="{ 'is-primary': toolBarMode === 'promote' }"
-                            @click="toolBarMode = 'promote'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-bed"></i>
-                            </span>
-                        </button>
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Change sleepover to waypoint"
-                            :class="{ 'is-primary': toolBarMode === 'demote' }"
-                            @click="toolBarMode = 'demote'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-map-signs"></i>
-                            </span>
-                        </button>
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Remove waypoint"
-                            :class="{ 'is-primary': toolBarMode === 'delete' }"
-                            @click="toolBarMode = 'delete'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-trash"></i>
-                            </span>
-                        </button>
-                        <button
-                            class="button is-small is-dark is-rounded"
-                            title="Add waypoint"
-                            :class="{ 'is-primary': toolBarMode === 'add' }"
-                            @click="toolBarMode = 'add'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-pen"></i>
-                            </span>
-                        </button>
-                    </div>
-                </l-control>
                 <l-control position="topleft">
-                    <div class="dropdown" :class="{ 'is-active': dropdownActive }">
+                    <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
                         <div class="dropdown-trigger">
                             <button
-                                @click="dropdownActive = !dropdownActive"
+                                @click="dropDown.menu = !dropDown.menu"
                                 class="button is-small is-primary"
                                 aria-haspopup="true"
-                                aria-controls="dropdown-menu2"
+                                aria-controls="dropdown-menu"
+                            >
+                                <span class="icon is-small">
+                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-content">
+                                <a
+                                    class="dropdown-item is-small"
+                                    @click="
+                                        dropDown.menu = false;
+                                        clearEverything();
+                                    "
+                                >
+                                    Clear Everything
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown" :class="{ 'is-active': dropDown.tileProvider }">
+                        <div class="dropdown-trigger">
+                            <button
+                                @click="dropDown.tileProvider = !dropDown.tileProvider"
+                                class="button is-small is-primary"
+                                aria-haspopup="true"
+                                aria-controls="dropdown-tileprovider"
                             >
                                 <span>Map</span>
                                 <span class="icon is-small">
@@ -104,7 +68,7 @@
                                 </span>
                             </button>
                         </div>
-                        <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+                        <div class="dropdown-menu" id="dropdown-tileprovider" role="menu">
                             <div class="dropdown-content">
                                 <a
                                     v-for="tileProvider in tileProviders"
@@ -113,13 +77,90 @@
                                     :key="tileProvider.id"
                                     @click="
                                         setTileprovider(tileProvider);
-                                        dropdownActive = false;
+                                        tileProviderDropDown = false;
                                     "
                                 >
                                     {{ tileProvider.name }}
                                 </a>
                             </div>
                         </div>
+                    </div>
+                </l-control>
+                <l-control position="topright"> </l-control>
+                <l-control position="bottomleft">
+                    <div class="buttons has-addons">
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Remove something (d)"
+                            :class="{ 'is-primary': toolBarMode === 'delete' }"
+                            v-shortkey="['x']"
+                            @shortkey="toolBarMode = 'delete'"
+                            @click="toolBarMode = 'delete'"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-trash"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Add NoGo area (n)"
+                            :class="{ 'is-primary': mapOptions.addNogo }"
+                            v-shortkey="['n']"
+                            @shortkey="mapOptions.addNogo = !mapOptions.addNogo"
+                            @click="mapOptions.addNogo = !mapOptions.addNogo"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-ban"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Split route (s)"
+                            :class="{ 'is-primary': toolBarMode === 'insert' }"
+                            v-shortkey="['s']"
+                            @shortkey="toolBarMode = 'insert'"
+                            @click="toolBarMode = 'insert'"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-cut"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Change waypoint to sleepover (o)"
+                            :class="{ 'is-primary': toolBarMode === 'promote' }"
+                            v-shortkey="['o']"
+                            @shortkey="toolBarMode = 'promote'"
+                            @click="toolBarMode = 'promote'"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-bed"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Change sleepover to waypoint (Shift+o)"
+                            :class="{ 'is-primary': toolBarMode === 'demote' }"
+                            v-shortkey="['shift', 'o']"
+                            @shortkey="toolBarMode = 'demote'"
+                            @click="toolBarMode = 'demote'"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-map-signs"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-small is-dark is-rounded"
+                            title="Add waypoint (w)"
+                            :class="{ 'is-primary': toolBarMode === 'add' }"
+                            @click="toolBarMode = 'add'"
+                            v-shortkey="['w']"
+                            @shortkey="toolBarMode = 'add'"
+                        >
+                            <span class="icon">
+                                <i class="fa fa-pen"></i>
+                            </span>
+                        </button>
                     </div>
                 </l-control>
             </l-map>
@@ -133,12 +174,14 @@ import { latLng } from 'leaflet';
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
 import BRouter from '@/util/BRouter';
 import TileProviders from '@/util/TileProviders';
+import RouteMeta from '@/components/RouteMeta.vue';
 import TrackMeta from '@/components/TrackMeta.vue';
 import WaypointList from '@/components/WaypointList.vue';
 
 export default {
     name: 'Map',
     components: {
+        RouteMeta,
         TrackMeta,
         WaypointList,
         LMap,
@@ -147,7 +190,10 @@ export default {
     },
     data() {
         return {
-            dropdownActive: false,
+            dropDown: {
+                tileProvider: false,
+                menu: false
+            },
             trackDrawer: undefined,
             trackDrawerToolBar: undefined,
             trackDrawerOptions: {
@@ -230,6 +276,7 @@ export default {
                 else p.visible = false;
             });
         },
+        clearEverything() {},
         _createNoGo(latlng, options, map) {
             let nogo = window.L.circle(latlng, options);
             return nogo

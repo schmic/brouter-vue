@@ -1,5 +1,5 @@
 <template>
-    <article class="message is-grey">
+    <article class="message is-dark">
         <div class="message-header">
             Waypoints
         </div>

@@ -12,8 +12,12 @@ import 'leaflet-easybutton/src/easy-button';
 import 'leaflet-trackdrawer/src/index';
 import 'leaflet-editable/src/Leaflet.Editable';
 
+import ShortKey from 'vue-shortkey';
+
 Vue.config.productionTip = false;
-Vue.config.devtools = false;
+Vue.config.devtools = true;
+
+Vue.use(ShortKey);
 
 import { Icon } from 'leaflet';
 delete Icon.Default.prototype._getIconUrl;

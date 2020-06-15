@@ -20,6 +20,7 @@
             <div id="navMenuTop" class="navbar-menu">
                 <div class="navbar-start">
                     <router-link class="navbar-item" to="/map">Map</router-link>
+                    <router-link class="navbar-item" to="/help">Help</router-link>
                     <!-- <div class="navbar-item has-dropdown is-hoverable">
                         <a class="navbar-link is-active" href="#">Docs</a>
                         <div class="navbar-dropdown">
@@ -59,12 +60,13 @@
                     </div> -->
                 </div>
                 <div class="navbar-end">
-                    <a class="navbar-item" href="https://github.com/schmic/brouter-vue" target="_blank">
+                    <router-link class="navbar-item" to="/about">About</router-link>
+                    <!-- <a class="navbar-item" href="https://github.com/schmic/brouter-vue" target="_blank">
                         <span class="icon" style="color: #333;margin-right: 4px">
                             <i class="fab fa-github"></i>
                         </span>
                         Github
-                    </a>
+                    </a> -->
                     <!-- <div class="navbar-item">
                         <div class="field is-grouped">
                             <p class="control">
