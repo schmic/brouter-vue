@@ -38,13 +38,13 @@ export default {
         {
             id: 152,
             name: 'TODO: NoGo name',
-            latlng: { lat: 49.6413561337561, lng: 8.689295011526298 },
+            latlng: { lat: 49.641356, lng: 8.689295 },
             radius: 2500
         },
         {
             id: 171,
             name: 'TODO: NoGo name',
-            latlng: { lat: 49.709378755793985, lng: 8.724314997246566 },
+            latlng: { lat: 49.709378, lng: 8.724315 },
             radius: 2500
         }
     ]
