@@ -71,8 +71,8 @@ export default new Vuex.Store({
             }
         },
         stateSave({ commit }, triggeredMutation) {
-            triggeredMutation.type == 'waypointsUpdate' && commit('stateSave');
-            triggeredMutation.type == 'nogoUpdate' && commit('stateSave');
+            triggeredMutation.type.startsWith('waypoint') && commit('stateSave');
+            triggeredMutation.type.startsWith('nogo') && commit('stateSave');
         }
     }
 });
