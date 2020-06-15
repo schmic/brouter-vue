@@ -69,8 +69,6 @@ function readRouteUrl(routeStr) {
                 break;
             case 'nogos':
                 parts[key] = values.split('|').map(value => {
-                    console.log('value', value);
-
                     value = value.split(',');
                     return {
                         radius: parseFloat(value[2]),
