@@ -325,7 +325,7 @@ export default {
                     icon: window.L.AwesomeMarkers.icon({
                         icon: 'map-marker-alt',
                         prefix: 'fa',
-                        markerColor: 'green'
+                        markerColor: 'purple'
                     })
                 },
                 ...options
