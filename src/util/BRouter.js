@@ -1,5 +1,17 @@
-// HINT: URL example for the BRouter backend
-// => /brouter?lonlats=1.1,1.2|2.1,2.2|3.1,3.2|4.1,4.2&nogos=-1.1,-1.2,1|-2.1,-2.2,2&profile=shortest&alternativeidx=1&format=kml
+/*
+ * Parameters for the BRouter URL:
+ *
+ * lonlats = lon,lat|... (unlimited list of lon,lat waypoints separated by |)
+ * nogos = lon,lat,radius|... (optional, radius in meters)
+ * profile = profile file name without .brf
+ * alternativeidx = [0|1|2|3] (optional, default 0)
+ * format = [kml|gpx|geojson] (optional, default gpx)
+ * trackname = name used for filename and format specific trackname (optional, default brouter)
+ * exportWaypoints = 1 to export them (optional, default is no export)
+ * pois = lon,lat,name|... (optional)
+ *
+ * example: /brouter?lonlats=1.1,1.2|2.1,2.2|3.1,3.2|4.1,4.2&nogos=-1.1,-1.2,1|-2.1,-2.2,2&profile=shortest&alternativeidx=1&format=kml
+ */
 
 const settings = {
     //     URL_TEMPLATE:
