@@ -4,6 +4,7 @@
             <route-meta></route-meta>
             <track-meta></track-meta>
             <waypoint-list></waypoint-list>
+            <poi-list></poi-list>
         </div>
         <div class="column">
             <l-map
@@ -126,6 +127,18 @@
                         </button>
                         <button
                             class="button is-dark is-rounded"
+                            title="Add POI (p)"
+                            :class="{ 'is-primary': toolBarMode === 'poi' }"
+                            v-shortkey="['p']"
+                            @shortkey="toolBarMode = 'poi'"
+                            @click="toolBarMode = 'poi'"
+                        >
+                            <span class="icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+                        </button>
+                        <button
+                            class="button is-dark is-rounded"
                             title="Split route (s)"
                             :class="{ 'is-primary': toolBarMode === 'insert' }"
                             v-shortkey="['s']"
@@ -187,6 +200,7 @@ import BRouter from '@/util/BRouter';
 import TileProviders from '@/util/TileProviders';
 import RouteMeta from '@/components/RouteMeta.vue';
 import TrackMeta from '@/components/TrackMeta.vue';
+import PoiList from '@/components/PoiList.vue';
 import WaypointList from '@/components/WaypointList.vue';
 
 export default {
@@ -194,6 +208,7 @@ export default {
     components: {
         RouteMeta,
         TrackMeta,
+        PoiList,
         WaypointList,
         LMap,
         LTileLayer,
@@ -232,11 +247,11 @@ export default {
         let defaultCenter = JSON.stringify(this.center);
         this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
     },
-    mounted() {
-        // this.$nextTick(() => {
-        //     this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
-        // });
-    },
+    // mounted() {
+    //     this.$nextTick(() => {
+    //         this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
+    //     });
+    // },
     computed: {
         toolBarMode: {
             get() {
@@ -266,6 +281,10 @@ export default {
                 nogo = this._createNoGo(nogo.latlng, { radius: nogo.radius }, this.$refs.map.mapObject);
                 this.$store.commit('nogoUpdate', nogo);
             });
+            this.$store.state.pois.forEach(poi => {
+                poi = this._createPOI(poi.latlng, {}, this.$refs.map.mapObject);
+                this.$store.commit('poiUpdate', poi);
+            });
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;
@@ -276,11 +295,17 @@ export default {
             localStorage.setItem('map/center', JSON.stringify(center));
         },
         onMapClicked(evt) {
+            let map = this.$refs.map.mapObject;
+
             if (this.toolBarMode === 'nogo') {
                 this.toolBarMode = undefined;
-                let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, this.$refs.map.mapObject);
+                let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, map);
                 this.$store.commit('nogoUpdate', nogo);
                 this.trackDrawer.refreshEdges();
+            } else if (this.toolBarMode === 'poi') {
+                this.toolBarMode = undefined;
+                let poi = this._createPOI(evt.latlng, {}, map);
+                this.$store.commit('poiUpdate', poi);
             }
         },
         setTileprovider(provider) {
@@ -292,6 +317,28 @@ export default {
         onRouteClear() {
             this.$store.dispatch('routeClear');
             location.reload();
+        },
+        _createPOI(latlng, options, map) {
+            options = {
+                ...{
+                    draggable: true,
+                    icon: window.L.AwesomeMarkers.icon({
+                        icon: 'map-marker-alt',
+                        prefix: 'fa',
+                        markerColor: 'green'
+                    })
+                },
+                ...options
+            };
+            let poi = window.L.marker(latlng, options);
+            return poi.addTo(map).on('click', evt => {
+                let poi = evt.target;
+                window.L.DomEvent.stop(evt);
+                if (this.toolBarMode == 'delete') {
+                    poi.remove();
+                    this.$store.commit('poiRemove', poi);
+                }
+            });
         },
         _createNoGo(latlng, options, map) {
             let nogo = window.L.circle(latlng, options);

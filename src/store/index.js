@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import { version } from '../../package.json';
 
+import POI from '@/model/POI';
 import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
 import Waypoint from '@/model/Waypoint';
@@ -16,6 +17,7 @@ export default new Vuex.Store({
         waypoints: [],
         segments: [],
         nogos: [],
+        pois: [],
         stats: {
             distance: 0,
             totaltime: 0,
@@ -25,6 +27,17 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        poiUpdate(state, poi) {
+            poi = new POI(poi);
+            state.pois = state.pois.filter(_poi => !poi.equalsTo(_poi)).concat([poi]);
+        },
+        poiRemove(state, poi) {
+            poi = new POI(poi);
+            state.pois = state.pois.filter(_poi => !poi.equalsTo(_poi));
+        },
+        poisUpdate(state, pois) {
+            state.pois = pois.map(poi => new POI(poi));
+        },
         nogoUpdate(state, nogo) {
             nogo = new NoGo(nogo);
             state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo)).concat([nogo]);
@@ -62,8 +75,12 @@ export default new Vuex.Store({
             this.replaceState({ ...state, ...newState });
         },
         stateSave(state) {
-            localStorage.setItem('state/waypoints', JSON.stringify(state.waypoints));
-            localStorage.setItem('state/nogos', JSON.stringify(state.nogos));
+            ['waypoints', 'nogos', 'pois'].forEach(it =>
+                localStorage.setItem(`state/${it}`, JSON.stringify(state[it]))
+            );
+            // localStorage.setItem('state/waypoints', JSON.stringify(state.waypoints));
+            // localStorage.setItem('state/nogos', JSON.stringify(state.nogos));
+            // localStorage.setItem('state/pois', JSON.stringify(state.pois));
         }
     },
     actions: {
@@ -79,13 +96,15 @@ export default new Vuex.Store({
             if (localStorage.getItem('state/waypoints')) {
                 commit('stateMerge', {
                     waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
-                    nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]')
+                    nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]'),
+                    pois: JSON.parse(localStorage.getItem('state/pois') || '[]')
                 });
             }
         },
         stateSave({ commit }, triggeredMutation) {
             triggeredMutation.type.startsWith('waypoint') && commit('stateSave');
             triggeredMutation.type.startsWith('nogo') && commit('stateSave');
+            triggeredMutation.type.startsWith('poi') && commit('stateSave');
         },
         waypointsClear({ commit }) {
             commit('waypointsUpdate', []);
@@ -93,9 +112,13 @@ export default new Vuex.Store({
         nogosClear({ commit }) {
             commit('nogosUpdate', []);
         },
+        poisClear({ commit }) {
+            commit('poisUpdate', []);
+        },
         routeClear({ dispatch }) {
             dispatch('waypointsClear', []);
             dispatch('nogosClear', []);
+            dispatch('poisClear', []);
         }
     }
 });

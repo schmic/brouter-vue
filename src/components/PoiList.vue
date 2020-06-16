@@ -1,7 +1,7 @@
 <template>
     <article class="message is-dark">
         <div class="message-header">
-            Waypoints
+            POIs
         </div>
         <div class="message-body">
             <table class="table is-fullwidth">
@@ -11,15 +11,15 @@
                     <th>Lng</th>
                     <th></th>
                 </tr>
-                <tr v-for="waypoint in waypoints" :key="waypoint.id">
+                <tr v-for="(poi, index) in pois" :key="poi.id">
                     <td>
-                        <span> {{ waypoint.name.substring(0, 16) }} </span>
+                        <span> {{ poi.name ? poi.name.substring(0, 16) : index + 1 }} </span>
                     </td>
                     <td>
-                        <span> {{ waypoint.latlng.lat.toFixed(5) }} </span>
+                        <span> {{ poi.latlng.lat.toFixed(5) }} </span>
                     </td>
                     <td>
-                        <span> {{ waypoint.latlng.lng.toFixed(5) }} </span>
+                        <span> {{ poi.latlng.lng.toFixed(5) }} </span>
                     </td>
                 </tr>
             </table>
@@ -30,8 +30,8 @@
 <script>
 export default {
     computed: {
-        waypoints() {
-            return this.$store.state.waypoints;
+        pois() {
+            return this.$store.state.pois;
         }
     }
 };

@@ -9,8 +9,10 @@ function readSharedRoute(routeStr) {
                 // need to convert from lng,lat to lat,lng
                 parts['latlngs'] = values.split('|').map(value => {
                     return {
-                        lat: parseFloat(value.split(',')[1]),
-                        lng: parseFloat(value.split(',')[0])
+                        latlng: {
+                            lat: parseFloat(value.split(',')[1]),
+                            lng: parseFloat(value.split(',')[0])
+                        }
                     };
                 });
                 break;
@@ -33,4 +35,6 @@ function readSharedRoute(routeStr) {
     return parts;
 }
 
-export { readSharedRoute };
+function getSharedRoute() {}
+
+export { getSharedRoute, readSharedRoute };
