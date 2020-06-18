@@ -6,15 +6,30 @@
         <div class="message-body">
             <div class="field has-addons">
                 <div class="control is-expanded">
-                    <input class="input" type="text" placeholder="Route Name" />
+                    <input class="input" type="text" v-model="trackname" placeholder="Enter route name ..." />
                 </div>
                 <div class="control">
-                    <button class="button is-primary" title="Save">
-                        <span class="icon"> <i class="fa fa-save"></i></span>
+                    <button disabled class="button is-primary" title="Load">
+                        <span class="icon"> <i class="fa fa-upload"></i></span>
                     </button>
                 </div>
                 <div class="control">
-                    <button class="button is-primary" @click="shareRouteToClipboard" title="Copy route to clipboard">
+                    <button disabled class="button is-primary" title="Save">
+                        <span class="icon"> <i class="fa fa-download"></i></span>
+                    </button>
+                </div>
+                <div class="control">
+                    <button
+                        class="button is-primary"
+                        :disabled="trackname == undefined || trackname.length > 0"
+                        @click="downloadRoute"
+                        title="Download route"
+                    >
+                        <span class="icon"> <i class="fas fa-file-download"></i></span>
+                    </button>
+                </div>
+                <div class="control">
+                    <button class="button is-primary" @click="shareRouteToClipboard" title="Share route">
                         <span class="icon"> <i class="fa fa-share"></i></span>
                     </button>
                 </div>
@@ -35,16 +50,30 @@
                     </footer>
                 </div>
             </div>
-            <input id="dummy" name="dummy" type="hidden" />
+            <a id="dummyDownload" href=""></a>
+            <input id="dummyClipboard" name="dummy" type="hidden" />
         </div>
     </article>
 </template>
 
 <script>
-import { getRouteUrl } from '@/util/BRouter';
+import { getRouteUrl, getRouteDownload } from '@/util/BRouter';
 
 export default {
+    data() {
+        return {
+            trackname: undefined
+        };
+    },
     methods: {
+        downloadRoute() {
+            console.log('this.trackname', this.trackname);
+
+            const a = document.getElementById('dummyDownload');
+            a.href = getRouteDownload(this.trackname);
+            a.click();
+            a.href = '#';
+        },
         shareRouteToClipboard() {
             let shareUrl = getRouteUrl(
                 this.$store.state.waypoints.map(waypoint => waypoint.latlng),
@@ -52,7 +81,7 @@ export default {
             );
             shareUrl = `${location.href}?share=${shareUrl}`;
 
-            var copyText = document.getElementById('dummy');
+            var copyText = document.getElementById('dummyClipboard');
             copyText.type = 'text';
             copyText.value = shareUrl;
             copyText.select();

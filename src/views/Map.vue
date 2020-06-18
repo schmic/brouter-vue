@@ -74,7 +74,7 @@
                                 aria-haspopup="true"
                                 aria-controls="dropdown-tileprovider"
                             >
-                                <span>Map</span>
+                                <span>Map Providers</span>
                                 <span class="icon is-small">
                                     <i class="fa fa-angle-down" aria-hidden="true"></i>
                                 </span>

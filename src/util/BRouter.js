@@ -23,21 +23,31 @@ const settings = {
 
 import store from '@/store';
 
-function buildUrl(lonlats, nogos) {
+function buildUrl(lonlats, nogos, pois, options) {
     // TODO: get current (custom) profile
     // TODO: get current alternative route
+    // TODO: get current format
 
-    const profile = 'fastbike';
-    const alternativeidx = 0;
-    const format = 'geojson'; // do we understand anything else?
+    options = options || {};
+    options = { ...{ profile: 'fastbike', alternativeidx: 0, format: 'geojson' }, ...options };
 
     let urlPrefix = location.hostname == 'localhost' ? 'http://localhost:17777' : '';
     let urlBackendPath = `/brouter`;
     let url = `${urlPrefix}${urlBackendPath}`;
 
-    url += `?profile=${profile}`;
-    url += `&alternativeidx=${alternativeidx}`;
-    url += `&format=${format}`;
+    url += `?profile=${options.profile}`;
+    url += `&alternativeidx=${options.alternativeidx}`;
+    url += `&format=${options.format}`;
+    if (options.trackname) url += `&trackname=${options.trackname}`;
+
+    pois = (pois || [])
+        .map(poi => {
+            return `${poi.latlng.lng.toFixed(settings.PRECISION)},${poi.latlng.lat.toFixed(settings.PRECISION)},${
+                poi.name
+            }`;
+        })
+        .join('|');
+    if (pois) url += `&pois=${pois}`;
 
     nogos = (nogos || [])
         .map(nogo => {
@@ -56,6 +66,14 @@ function buildUrl(lonlats, nogos) {
     if (lonlats) url += `&lonlats=${lonlats}`;
 
     return url;
+}
+
+function getRouteDownload(routeName) {
+    routeName = routeName || `brouter-vue`;
+    let nogos = store.state.nogos;
+    let pois = store.state.pois;
+    let waypoints = store.state.waypoints.map(waypoint => waypoint.latlng);
+    return buildUrl(waypoints, nogos, pois, { format: 'gpx', trackname: routeName });
 }
 
 async function getRouteSegment(from, to) {
@@ -83,4 +101,4 @@ const BRouter = {
 };
 
 export default BRouter;
-export { route, buildUrl }; // make testable
+export { route, buildUrl, getRouteDownload }; // make testable
