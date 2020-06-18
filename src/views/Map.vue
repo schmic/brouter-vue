@@ -24,18 +24,18 @@
                     :name="tileProvider.name"
                     :visible="tileProvider.visible"
                     :url="tileProvider.url"
-                    :attribution="tileProvider.attribution"
+                    :attribution="tileProvider.options.attribution"
                     layer-type="base"
                 />
                 <l-control position="topleft">
                     <button
-                        class="button is-small is-primary"
+                        class="button is-primary"
                         @click="
                             showSidebar = !showSidebar;
                             $refs.map.mapObject._onResize();
                         "
                     >
-                        <span class="icon is-small">
+                        <span class="icon">
                             <i class="fa" :class="showSidebar ? 'fa-angle-left' : 'fa-angle-right'"></i>
                         </span>
                     </button>
@@ -43,11 +43,11 @@
                         <div class="dropdown-trigger">
                             <button
                                 @click="dropDown.menu = !dropDown.menu"
-                                class="button is-small is-primary"
+                                class="button is-primary"
                                 aria-haspopup="true"
                                 aria-controls="dropdown-menu"
                             >
-                                <span class="icon is-small">
+                                <span class="icon">
                                     <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                                 </span>
                             </button>

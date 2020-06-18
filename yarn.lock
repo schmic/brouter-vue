@@ -5943,6 +5943,11 @@ leaflet-filelayer@^1.2.0:
   resolved "https://registry.yarnpkg.com/leaflet-filelayer/-/leaflet-filelayer-1.2.0.tgz#9f822e68a06072b0b0a8f328ba9419ba96bbccb1"
   integrity sha512-H3HrOOM9bpkrRUacdnWISV0MKZXLBYsX24H4XV+55QbcGCvd9In6oPzANEnhsokHAwNWd9qP6GfiHEFCfn+qkA==
 
+leaflet-providers@^1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/leaflet-providers/-/leaflet-providers-1.10.1.tgz#30a7487aa0333e9fac9b47ced12011ec3780c624"
+  integrity sha512-6+K44xgRY13K7ildNY+5uCnkG3oBTol3GvSQQjLt2QWTJdob/PWzPHuvPzYiBDOELFy+aAzPo8+skU0sYUUzwg==
+
 leaflet-trackdrawer@schmic/Leaflet.TrackDrawer.git:
   version "0.5.0"
   resolved "https://codeload.github.com/schmic/Leaflet.TrackDrawer/tar.gz/41eca471526708428bfab94a8eadea879162189d"
