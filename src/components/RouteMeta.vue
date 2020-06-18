@@ -21,7 +21,7 @@
                 <div class="control">
                     <button
                         class="button is-primary"
-                        :disabled="trackname == undefined || trackname.length > 0"
+                        :disabled="trackname == undefined || trackname.length == 0"
                         @click="downloadRoute"
                         title="Download route"
                     >
