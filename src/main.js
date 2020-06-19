@@ -17,7 +17,7 @@ import ShortKey from 'vue-shortkey';
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
-Vue.use(ShortKey);
+Vue.use(ShortKey, { prevent: ['input', 'textarea'] });
 
 import { Icon } from 'leaflet';
 delete Icon.Default.prototype._getIconUrl;
