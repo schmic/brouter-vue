@@ -103,7 +103,7 @@
                     </section>
                     <footer class="modal-card-foot">
                         <button class="button is-success" @click="shareRouteTrigger">
-                            Share
+                            Copy to clipboard
                         </button>
                     </footer>
                 </div>
