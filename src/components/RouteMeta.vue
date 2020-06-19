@@ -6,7 +6,7 @@
         <div class="message-body">
             <div class="field has-addons">
                 <div class="control is-expanded">
-                    <input class="input" type="text" v-model="trackname" placeholder="Enter route name ..." />
+                    <input v-model="trackname" class="input" type="text" placeholder="Enter route name ..." />
                 </div>
                 <div class="control">
                     <button disabled class="button is-primary" title="Load">
@@ -21,15 +21,20 @@
                 <div class="control">
                     <button
                         class="button is-primary"
+                        title="Download route"
                         :disabled="trackname == undefined || trackname.length == 0"
                         @click="exportModalShow"
-                        title="Download route"
                     >
                         <span class="icon"> <i class="fas fa-file-download"></i></span>
                     </button>
                 </div>
                 <div class="control">
-                    <button class="button is-primary" @click="shareRouteToClipboard" title="Share route">
+                    <button
+                        class="button is-primary"
+                        title="Share route"
+                        :disabled="trackname == undefined || trackname.length == 0"
+                        @click="shareModalShow"
+                    >
                         <span class="icon"> <i class="fa fa-share"></i></span>
                     </button>
                 </div>
@@ -46,9 +51,9 @@
                             <label class="label">Name</label>
                             <div class="control">
                                 <input
+                                    v-model="trackname"
                                     class="input"
                                     type="text"
-                                    v-model="trackname"
                                     placeholder="Enter route name ..."
                                 />
                             </div>
@@ -69,7 +74,7 @@
                         <div class="field">
                             <label class="label" for="checkbox"> Include POIs</label>
                             <div class="control">
-                                <input type="checkbox" id="checkbox" v-model="modal.export.includePOIs" />
+                                <input id="checkbox" v-model="modal.export.includePOIs" type="checkbox" />
                             </div>
                         </div>
                     </section>
@@ -81,6 +86,28 @@
                     </footer>
                 </div>
             </div>
+            <div id="modal-share" class="modal" :class="{ 'is-active': modal.share.show }">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">Share Route</p>
+                        <button class="delete" aria-label="close" @click="shareModalHide"></button>
+                    </header>
+                    <section class="modal-card-body left-align">
+                        <div class="field">
+                            <label class="label">Name</label>
+                            <div class="control">
+                                <input v-model="modal.share.url" class="input" type="text" placeholder="Share URL" />
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        <button class="button is-success" @click="shareRouteTrigger">
+                            Share
+                        </button>
+                    </footer>
+                </div>
+            </div>
             <a id="dummyDownload" href=""></a>
             <input id="dummyClipboard" name="dummy" type="hidden" />
         </div>
@@ -88,7 +115,7 @@
 </template>
 
 <script>
-import { getRouteUrl, getRouteDownload } from '@/util/BRouter';
+import { getRouteDownload } from '@/util/BRouter';
 
 export default {
     data() {
@@ -98,12 +125,38 @@ export default {
                     show: false,
                     format: 'gpx',
                     includePOIs: false
+                },
+                share: {
+                    show: false,
+                    includePOIs: true,
+                    url: ''
                 }
             },
             trackname: undefined
         };
     },
     methods: {
+        shareModalShow() {
+            this.modal.share.show = true;
+            let shareUrl = getRouteDownload(this.trackname, this.modal.share).split('?')[1];
+            this.modal.share.url = `${location.href}?share=${shareUrl}`;
+        },
+        shareModalHide() {
+            this.modal.share.show = false;
+        },
+        shareRouteTrigger() {
+            console.log(`shareUrl: ${this.modal.share.url}`);
+
+            var copyText = document.getElementById('dummyClipboard');
+            copyText.type = 'text';
+            copyText.value = this.modal.share.url;
+            copyText.select();
+            document.execCommand('copy');
+            copyText.type = 'hidden';
+            copyText.value = '';
+
+            this.shareModalHide();
+        },
         exportModalShow() {
             this.modal.export.show = true;
         },
@@ -116,26 +169,8 @@ export default {
             a.click();
             a.href = '#';
             this.exportModalHide();
-        },
-        shareRouteToClipboard() {
-            let shareUrl = getRouteUrl(
-                this.$store.state.waypoints.map(waypoint => waypoint.latlng),
-                this.$store.state.nogos
-            );
-            shareUrl = `${location.href}?share=${shareUrl}`;
-
-            var copyText = document.getElementById('dummyClipboard');
-            copyText.type = 'text';
-            copyText.value = shareUrl;
-            copyText.select();
-            document.execCommand('copy');
-            copyText.type = 'hidden';
-            copyText.value = '';
-
-            console.log(`shareUrl: ${shareUrl}`);
         }
-    },
-    computed: {}
+    }
 };
 </script>
 
