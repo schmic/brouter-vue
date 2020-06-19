@@ -24,10 +24,6 @@ const settings = {
 import store from '@/store';
 
 function buildUrl(lonlats, nogos, pois, options) {
-    // TODO: get current (custom) profile
-    // TODO: get current alternative route
-    // TODO: get current format
-
     options = options || {};
     options = { ...{ profile: 'fastbike', alternativeidx: 0, format: 'geojson' }, ...options };
 
@@ -68,12 +64,12 @@ function buildUrl(lonlats, nogos, pois, options) {
     return url;
 }
 
-function getRouteDownload(routeName) {
-    routeName = routeName || `brouter-vue`;
+function getRouteDownload(trackname, options) {
+    trackname = trackname || `brouter-vue`;
     let nogos = store.state.nogos;
-    let pois = store.state.pois;
+    let pois = options.includePOIs ? store.state.pois : [];
     let waypoints = store.state.waypoints.map(waypoint => waypoint.latlng);
-    return buildUrl(waypoints, nogos, pois, { format: 'gpx', trackname: routeName });
+    return buildUrl(waypoints, nogos, pois, { trackname: trackname, ...options });
 }
 
 async function getRouteSegment(from, to) {

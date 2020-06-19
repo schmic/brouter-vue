@@ -22,7 +22,7 @@
                     <button
                         class="button is-primary"
                         :disabled="trackname == undefined || trackname.length == 0"
-                        @click="downloadRoute"
+                        @click="exportModalShow"
                         title="Download route"
                     >
                         <span class="icon"> <i class="fas fa-file-download"></i></span>
@@ -34,19 +34,50 @@
                     </button>
                 </div>
             </div>
-            <div class="modal">
+            <div id="modal-export" class="modal" :class="{ 'is-active': modal.export.show }">
                 <div class="modal-background"></div>
                 <div class="modal-card">
                     <header class="modal-card-head">
-                        <p class="modal-card-title">Modal title</p>
-                        <button class="delete" aria-label="close"></button>
+                        <p class="modal-card-title">Export Route</p>
+                        <button class="delete" aria-label="close" @click="exportModalHide"></button>
                     </header>
-                    <section class="modal-card-body">
-                        <!-- Content ... -->
+                    <section class="modal-card-body left-align">
+                        <div class="field">
+                            <label class="label">Name</label>
+                            <div class="control">
+                                <input
+                                    class="input"
+                                    type="text"
+                                    v-model="trackname"
+                                    placeholder="Enter route name ..."
+                                />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Format</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select v-model="modal.export.format">
+                                        <option disabled value="">Please select export format</option>
+                                        <option value="gpx">GPX</option>
+                                        <option value="kml">KML</option>
+                                        <option value="geojson">GeoJSON</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label" for="checkbox"> Include POIs</label>
+                            <div class="control">
+                                <input type="checkbox" id="checkbox" v-model="modal.export.includePOIs" />
+                            </div>
+                        </div>
                     </section>
                     <footer class="modal-card-foot">
-                        <button class="button is-success">Save changes</button>
-                        <button class="button">Cancel</button>
+                        <button class="button is-success" @click="exportRouteTrigger">
+                            Export
+                        </button>
+                        <!-- <button class="button" @click="exportModalHide">Cancel</button> -->
                     </footer>
                 </div>
             </div>
@@ -62,17 +93,29 @@ import { getRouteUrl, getRouteDownload } from '@/util/BRouter';
 export default {
     data() {
         return {
+            modal: {
+                export: {
+                    show: false,
+                    format: 'gpx',
+                    includePOIs: false
+                }
+            },
             trackname: undefined
         };
     },
     methods: {
-        downloadRoute() {
-            console.log('this.trackname', this.trackname);
-
+        exportModalShow() {
+            this.modal.export.show = true;
+        },
+        exportModalHide() {
+            this.modal.export.show = false;
+        },
+        exportRouteTrigger() {
             const a = document.getElementById('dummyDownload');
-            a.href = getRouteDownload(this.trackname);
+            a.href = getRouteDownload(this.trackname, this.modal.export);
             a.click();
             a.href = '#';
+            this.exportModalHide();
         },
         shareRouteToClipboard() {
             let shareUrl = getRouteUrl(
@@ -96,4 +139,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.modal {
+    z-index: 500;
+    text-align: left;
+}
+</style>
