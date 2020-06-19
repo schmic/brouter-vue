@@ -6,8 +6,9 @@ import Map from '../views/Map.vue';
 Vue.use(VueRouter);
 
 const routes = [
+    { path: '/', redirect: '/map' },
     {
-        path: '/',
+        path: '/home',
         name: 'Home',
         component: Home
     },
