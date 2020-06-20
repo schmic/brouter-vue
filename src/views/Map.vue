@@ -1,6 +1,6 @@
 <template>
     <div class="columns is-mobile">
-        <div class="column is-one-quarter" v-if="showSidebar">
+        <div v-if="showSidebar" class="column is-one-quarter">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <waypoint-list></waypoint-list>
@@ -42,17 +42,17 @@
                     <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
                         <div class="dropdown-trigger">
                             <button
-                                @click="dropDown.menu = !dropDown.menu"
                                 class="button is-primary"
                                 aria-haspopup="true"
                                 aria-controls="dropdown-menu"
+                                @click="dropDown.menu = !dropDown.menu"
                             >
                                 <span class="icon">
                                     <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                                 </span>
                             </button>
                         </div>
-                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div id="dropdown-menu" class="dropdown-menu" role="menu">
                             <div class="dropdown-content">
                                 <a
                                     class="dropdown-item is-small"
@@ -61,7 +61,7 @@
                                         onRouteClear();
                                     "
                                 >
-                                    Clear Everything
+                                    Clear route
                                 </a>
                             </div>
                         </div>
@@ -69,10 +69,10 @@
                     <div class="dropdown" :class="{ 'is-active': dropDown.tileProvider }">
                         <div class="dropdown-trigger">
                             <button
-                                @click="dropDown.tileProvider = !dropDown.tileProvider"
-                                class="button is-small is-primary"
                                 aria-haspopup="true"
+                                class="button is-small is-primary"
                                 aria-controls="dropdown-tileprovider"
+                                @click="dropDown.tileProvider = !dropDown.tileProvider"
                             >
                                 <span>Map Providers</span>
                                 <span class="icon is-small">
@@ -80,13 +80,13 @@
                                 </span>
                             </button>
                         </div>
-                        <div class="dropdown-menu" id="dropdown-tileprovider" role="menu">
+                        <div id="dropdown-tileprovider" class="dropdown-menu" role="menu">
                             <div class="dropdown-content">
                                 <a
                                     v-for="tileProvider in tileProviders"
+                                    :key="tileProvider.id"
                                     class="dropdown-item is-small"
                                     :class="{ 'is-active': tileProvider.visible }"
-                                    :key="tileProvider.id"
                                     @click="
                                         setTileprovider(tileProvider);
                                         tileProviderDropDown = false;
@@ -100,12 +100,12 @@
                 </l-control>
                 <l-control position="topright"> </l-control>
                 <l-control position="bottomleft">
-                    <div class="buttons has-addons" v-shortkey="['esc']" @shortkey="toolBarMode = undefined">
+                    <div v-shortkey="['esc']" class="buttons has-addons" @shortkey="toolBarMode = undefined">
                         <button
+                            v-shortkey="['x']"
                             class="button is-dark is-rounded"
                             title="Remove something (d)"
                             :class="{ 'is-primary': toolBarMode === 'delete' }"
-                            v-shortkey="['x']"
                             @shortkey="toolBarMode = 'delete'"
                             @click="toolBarMode = 'delete'"
                         >
@@ -114,10 +114,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['n']"
                             class="button is-dark is-rounded"
                             title="Add NoGo area (n)"
                             :class="{ 'is-primary': toolBarMode === 'nogo' }"
-                            v-shortkey="['n']"
                             @shortkey="toolBarMode = 'nogo'"
                             @click="toolBarMode = 'nogo'"
                         >
@@ -126,10 +126,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['p']"
                             class="button is-dark is-rounded"
                             title="Add POI (p)"
                             :class="{ 'is-primary': toolBarMode === 'poi' }"
-                            v-shortkey="['p']"
                             @shortkey="toolBarMode = 'poi'"
                             @click="toolBarMode = 'poi'"
                         >
@@ -138,10 +138,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['s']"
                             class="button is-dark is-rounded"
                             title="Split route (s)"
                             :class="{ 'is-primary': toolBarMode === 'insert' }"
-                            v-shortkey="['s']"
                             @shortkey="toolBarMode = 'insert'"
                             @click="toolBarMode = 'insert'"
                         >
@@ -150,10 +150,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['o']"
                             class="button is-dark is-rounded"
                             title="Change waypoint to sleepover (o)"
                             :class="{ 'is-primary': toolBarMode === 'promote' }"
-                            v-shortkey="['o']"
                             @shortkey="toolBarMode = 'promote'"
                             @click="toolBarMode = 'promote'"
                         >
@@ -162,10 +162,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['shift', 'o']"
                             class="button is-dark is-rounded"
                             title="Change sleepover to waypoint (Shift+o)"
                             :class="{ 'is-primary': toolBarMode === 'demote' }"
-                            v-shortkey="['shift', 'o']"
                             @shortkey="toolBarMode = 'demote'"
                             @click="toolBarMode = 'demote'"
                         >
@@ -174,10 +174,10 @@
                             </span>
                         </button>
                         <button
+                            v-shortkey="['w']"
                             class="button is-dark is-rounded"
                             title="Add waypoint (w)"
                             :class="{ 'is-primary': toolBarMode === 'add' }"
-                            v-shortkey="['w']"
                             @shortkey="toolBarMode = 'add'"
                             @click="toolBarMode = 'add'"
                         >
@@ -240,7 +240,19 @@ export default {
             pois: []
         };
     },
+    computed: {
+        toolBarMode: {
+            get() {
+                return this.trackDrawerToolBar && this.trackDrawerToolBar.options.mode;
+            },
+            set(mode) {
+                this.trackDrawerToolBar.setMode(mode == this.toolBarMode ? null : mode);
+            }
+        }
+    },
     created() {
+        if (this.$route.query.share) this.$router.push({ path: 'route', query: this.$route.query });
+
         let defaultZoom = JSON.stringify(this.zoom);
         this.zoom = parseInt(localStorage.getItem('map/zoom') || defaultZoom);
 
@@ -252,16 +264,6 @@ export default {
     //         this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
     //     });
     // },
-    computed: {
-        toolBarMode: {
-            get() {
-                return this.trackDrawerToolBar && this.trackDrawerToolBar.options.mode;
-            },
-            set(mode) {
-                this.trackDrawerToolBar.setMode(mode == this.toolBarMode ? null : mode);
-            }
-        }
-    },
     methods: {
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
@@ -364,8 +366,7 @@ export default {
                     }
                 });
         }
-    },
-    watch: {}
+    }
 };
 </script>
 
