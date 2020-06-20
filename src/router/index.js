@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Map from '../views/Map.vue';
+import Route from '../views/Route.vue';
 
 Vue.use(VueRouter);
 
@@ -16,6 +17,11 @@ const routes = [
         path: '/map',
         name: 'Map',
         component: Map
+    },
+    {
+        path: '/route/:name?',
+        name: 'Route',
+        component: Route
     }
     // {
     //     path: '/about',
