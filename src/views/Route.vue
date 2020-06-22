@@ -12,7 +12,7 @@
                 </div>
             </div>
         </section>
-        <article v-if="routeList.length == 0" class="message is-info">
+        <article v-if="routeNames.length == 0" class="message is-info">
             <div class="message-header">
                 <p>Hint</p>
             </div>
@@ -22,42 +22,9 @@
                 it.
             </div>
         </article>
-        <div v-for="route in routeList" :key="route.trackname" class="card">
-            <header class="card-header">
-                <p class="card-header-title">
-                    {{ route.trackname }}
-                </p>
-                <a href="#" class="card-header-icon" aria-label="more options">
-                    <span class="icon">
-                        <i class="fas fa-angle-down" aria-hidden="true"></i>
-                    </span>
-                </a>
-            </header>
-            <div class="card-content">
-                <div class="content">
-                    <nav class="level">
-                        <div class="level-item has-text-centered">
-                            <i class="fa fa-route"></i>
-                            {{ (route.stats.distance / 1000).toFixed(2) }} km
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <i class="far fa-clock"></i> {{ route.stats.formattedtime }} h
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <i class="fa fa-angle-double-up"></i> {{ route.stats.ascend.toFixed(0) }} m
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <i class="fa fa-angle-double-down"></i>
-                            {{ route.stats.descend.toFixed(0) }} m
-                        </div>
-                    </nav>
-                </div>
-            </div>
-            <footer class="card-footer">
-                <a href="#" class="card-footer-item" @click="onRouteLoad(route.trackname)">Load</a>
-                <a href="#" class="card-footer-item" @click="onRouteDelete(route.trackname)">Delete</a>
-            </footer>
-        </div>
+
+        <route-card v-for="(routeName, index) in routeNames" :key="index" :route-name="routeName"></route-card>
+
         <div id="modal-import" class="modal" :class="{ 'is-active': modal.import.show }">
             <div class="modal-background"></div>
             <div class="modal-card">
@@ -92,9 +59,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import RouteCard from '@/components/RouteCard';
+import { mapGetters } from 'vuex';
 
 export default {
+    components: {
+        RouteCard
+    },
     data() {
         return {
             modal: {
@@ -106,7 +77,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['routeList'])
+        ...mapGetters(['routeNames'])
     },
     created() {
         if (this.$route.query.share) {
@@ -114,18 +85,6 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['routeLoad']),
-        onRouteLoad(trackname) {
-            console.log('trackname', trackname);
-            this.routeLoad(trackname);
-            this.$router.push('map');
-        },
-        onRouteDelete(route) {
-            // TODO: move logic to store
-            this.routes = JSON.parse(localStorage.getItem('routes') || '[]').filter(_route => route != _route);
-            localStorage.setItem('routes', JSON.stringify(this.routes));
-            ['waypoints', 'nogos', 'pois', 'trackname'].forEach(it => localStorage.removeItem(`${route}/${it}`));
-        },
         importModalShow() {
             this.modal.import.trackname = this.$route.query.trackname
                 ? this.$route.query.trackname
@@ -141,9 +100,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.level-item {
-    margin: 2em 1em;
-}
-</style>

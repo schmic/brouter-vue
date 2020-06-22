@@ -26,9 +26,13 @@ export default new Vuex.Store({
             formattedtime: '0:00',
             ascend: 0,
             descend: 0
-        }
+        },
+        routes: []
     },
     mutations: {
+        routesUpdate(state, routes) {
+            state.routes = routes;
+        },
         tracknameUpdate(state, trackname) {
             state.trackname = trackname;
         },
@@ -94,7 +98,8 @@ export default new Vuex.Store({
                 trackname: trackname && trackname != 'undefined' ? JSON.parse(trackname) : undefined,
                 waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
                 nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]'),
-                pois: JSON.parse(localStorage.getItem('state/pois') || '[]')
+                pois: JSON.parse(localStorage.getItem('state/pois') || '[]'),
+                routes: Lockr.get('routes')
             });
         },
         stateSave({ commit }, triggeredMutation) {
@@ -126,10 +131,19 @@ export default new Vuex.Store({
             const route = this.getters.currentRoute;
             Lockr.sadd('routes', route.trackname);
             Lockr.set(`route_${route.trackname}`, route);
+            commit('routesUpdate', Lockr.smembers('routes'));
         },
         routeLoad({ commit }, trackname) {
             const route = Lockr.get(`route_${trackname}`);
             commit('stateRestore', route);
+        },
+        routeRemove({ commit, dispatch }, trackname) {
+            Lockr.srem('routes', trackname);
+            Lockr.rm(`route_${trackname}`);
+            commit('routesUpdate', Lockr.smembers('routes'));
+            if (trackname == this.getters.currentRoute.trackname) {
+                dispatch('routeClear');
+            }
         }
     },
     getters: {
@@ -142,10 +156,11 @@ export default new Vuex.Store({
                 stats: state.stats
             };
         },
-        routeList() {
-            return Lockr.smembers('routes').map(trackname => Lockr.get(`route_${trackname}`));
+        routeNames(state) {
+            return state.routes;
         },
-        routeByName(trackname) {
+        routeByName: state => trackname => {
+            state.routes; // don't need it but must do something
             return Lockr.get(`route_${trackname}`);
         }
     }
