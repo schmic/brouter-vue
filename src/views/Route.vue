@@ -12,7 +12,7 @@
                 </div>
             </div>
         </section>
-        <article v-if="routes.length == 0" class="message is-info">
+        <article v-if="routeList.length == 0" class="message is-info">
             <div class="message-header">
                 <p>Hint</p>
             </div>
@@ -22,10 +22,10 @@
                 it.
             </div>
         </article>
-        <div v-for="(route, index) in routes.reverse()" :key="index" class="card">
+        <div v-for="route in routeList" :key="route.trackname" class="card">
             <header class="card-header">
                 <p class="card-header-title">
-                    {{ route }}
+                    {{ route.trackname }}
                 </p>
                 <a href="#" class="card-header-icon" aria-label="more options">
                     <span class="icon">
@@ -35,14 +35,27 @@
             </header>
             <div class="card-content">
                 <div class="content">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
-                    <br />
-                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                    <nav class="level">
+                        <div class="level-item has-text-centered">
+                            <i class="fa fa-route"></i>
+                            {{ (route.stats.distance / 1000).toFixed(2) }} km
+                        </div>
+                        <div class="level-item has-text-centered">
+                            <i class="far fa-clock"></i> {{ route.stats.formattedtime }} h
+                        </div>
+                        <div class="level-item has-text-centered">
+                            <i class="fa fa-angle-double-up"></i> {{ route.stats.ascend.toFixed(0) }} m
+                        </div>
+                        <div class="level-item has-text-centered">
+                            <i class="fa fa-angle-double-down"></i>
+                            {{ route.stats.descend.toFixed(0) }} m
+                        </div>
+                    </nav>
                 </div>
             </div>
             <footer class="card-footer">
-                <a href="#" class="card-footer-item" @click="onRouteLoad(route)">Load</a>
-                <a href="#" class="card-footer-item" @click="onRouteDelete(route)">Delete</a>
+                <a href="#" class="card-footer-item" @click="onRouteLoad(route.trackname)">Load</a>
+                <a href="#" class="card-footer-item" @click="onRouteDelete(route.trackname)">Delete</a>
             </footer>
         </div>
         <div id="modal-import" class="modal" :class="{ 'is-active': modal.import.show }">
@@ -79,10 +92,11 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
     data() {
         return {
-            routes: [],
             modal: {
                 import: {
                     show: false,
@@ -91,16 +105,19 @@ export default {
             }
         };
     },
+    computed: {
+        ...mapGetters(['routeList'])
+    },
     created() {
         if (this.$route.query.share) {
             this.importModalShow();
         }
-        this.routes = JSON.parse(localStorage.getItem('routes') || '[]');
     },
     methods: {
-        onRouteLoad(route) {
-            console.log('route', route);
-            this.$store.dispatch('stateRestore', route);
+        ...mapActions(['routeLoad']),
+        onRouteLoad(trackname) {
+            console.log('trackname', trackname);
+            this.routeLoad(trackname);
             this.$router.push('map');
         },
         onRouteDelete(route) {
@@ -125,4 +142,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.level-item {
+    margin: 2em 1em;
+}
+</style>

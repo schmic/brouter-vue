@@ -268,10 +268,6 @@ export default {
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
-            this.trackDrawer.on('TrackDrawer:done', () => {
-                this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
-                this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
-            });
 
             // import
             this.$store.state.waypoints.forEach(waypoint => {
@@ -286,6 +282,11 @@ export default {
             this.$store.state.pois.forEach(poi => {
                 poi = this._createPOI(poi.latlng, {}, this.$refs.map.mapObject);
                 this.$store.commit('poiUpdate', poi);
+            });
+
+            this.trackDrawer.on('TrackDrawer:done', () => {
+                this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
+                this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
             });
         },
         onMapZoomChanged(zoom) {

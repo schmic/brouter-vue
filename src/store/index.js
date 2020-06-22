@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { version } from '../../package.json';
+import Lockr from 'lockr';
 
 import POI from '@/model/POI';
 import NoGo from '@/model/NoGo';
@@ -11,9 +11,11 @@ import Waypoint from '@/model/Waypoint';
 import { statsCalc, statsReset } from '@/store/stats';
 
 Vue.use(Vuex);
+Lockr.prefix = 'brtr_';
 
 export default new Vuex.Store({
     state: {
+        trackname: undefined,
         waypoints: [],
         segments: [],
         nogos: [],
@@ -27,6 +29,9 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        tracknameUpdate(state, trackname) {
+            state.trackname = trackname;
+        },
         poiUpdate(state, poi) {
             poi = new POI(poi);
             state.pois = state.pois.filter(_poi => !poi.equalsTo(_poi)).concat([poi]);
@@ -50,6 +55,7 @@ export default new Vuex.Store({
             state.nogos = nogos.map(nogo => new NoGo(nogo));
         },
         waypointsUpdate(state, trackDrawerNodes) {
+            // from trackdrawer event
             let markers = [];
             trackDrawerNodes.map(node => (markers = markers.concat(node.markers)));
             state.waypoints = markers.map(
@@ -57,6 +63,7 @@ export default new Vuex.Store({
             );
         },
         segmentsUpdate(state, trackDrawerSteps) {
+            // from trackdrawer event
             let edges = [];
             trackDrawerSteps.map(step => (edges = edges.concat(step.edges)));
             state.segments = edges.map(
@@ -71,37 +78,27 @@ export default new Vuex.Store({
             );
             state.segments.length ? statsCalc(state) : statsReset(state);
         },
-        stateMerge(state, newState) {
+        stateRestore(state, newState) {
             this.replaceState({ ...state, ...newState });
         },
         stateSave(state) {
-            ['waypoints', 'nogos', 'pois'].forEach(it =>
+            ['trackname', 'waypoints', 'nogos', 'pois'].forEach(it =>
                 localStorage.setItem(`state/${it}`, JSON.stringify(state[it]))
             );
-            // localStorage.setItem('state/waypoints', JSON.stringify(state.waypoints));
-            // localStorage.setItem('state/nogos', JSON.stringify(state.nogos));
-            // localStorage.setItem('state/pois', JSON.stringify(state.pois));
         }
     },
     actions: {
         stateRestore({ commit }) {
-            let storageVersion = localStorage.getItem('state/version') || version;
-
-            if (version !== storageVersion) {
-                // migrate storage
-            } else {
-                console.log(`Storage version ${version} verified`);
-            }
-
-            if (localStorage.getItem('state/waypoints')) {
-                commit('stateMerge', {
-                    waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
-                    nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]'),
-                    pois: JSON.parse(localStorage.getItem('state/pois') || '[]')
-                });
-            }
+            const trackname = localStorage.getItem('state/trackname');
+            commit('stateRestore', {
+                trackname: trackname && trackname != 'undefined' ? JSON.parse(trackname) : undefined,
+                waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
+                nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]'),
+                pois: JSON.parse(localStorage.getItem('state/pois') || '[]')
+            });
         },
         stateSave({ commit }, triggeredMutation) {
+            triggeredMutation.type.startsWith('trackname') && commit('stateSave');
             triggeredMutation.type.startsWith('waypoint') && commit('stateSave');
             triggeredMutation.type.startsWith('nogo') && commit('stateSave');
             triggeredMutation.type.startsWith('poi') && commit('stateSave');
@@ -115,10 +112,41 @@ export default new Vuex.Store({
         poisClear({ commit }) {
             commit('poisUpdate', []);
         },
+        tracknameClear({ commit }) {
+            commit('tracknameUpdate', undefined);
+        },
         routeClear({ dispatch }) {
+            dispatch('tracknameClear', []);
             dispatch('waypointsClear', []);
             dispatch('nogosClear', []);
             dispatch('poisClear', []);
+        },
+        routeSave({ commit }, trackname) {
+            commit('tracknameUpdate', trackname);
+            const route = this.getters.currentRoute;
+            Lockr.sadd('routes', route.trackname);
+            Lockr.set(`route_${route.trackname}`, route);
+        },
+        routeLoad({ commit }, trackname) {
+            const route = Lockr.get(`route_${trackname}`);
+            commit('stateRestore', route);
+        }
+    },
+    getters: {
+        currentRoute(state) {
+            return {
+                trackname: state.trackname,
+                waypoints: state.waypoints,
+                nogos: state.nogos,
+                pois: state.pois,
+                stats: state.stats
+            };
+        },
+        routeList() {
+            return Lockr.smembers('routes').map(trackname => Lockr.get(`route_${trackname}`));
+        },
+        routeByName(trackname) {
+            return Lockr.get(`route_${trackname}`);
         }
     }
 });

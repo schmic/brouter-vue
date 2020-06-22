@@ -9,12 +9,12 @@
                     <input v-model="trackname" class="input" type="text" placeholder="Enter route name ..." />
                 </div>
                 <div class="control">
-                    <button disabled class="button is-primary" title="Load">
-                        <span class="icon"> <i class="fa fa-upload"></i></span>
-                    </button>
-                </div>
-                <div class="control">
-                    <button disabled class="button is-primary" title="Save">
+                    <button
+                        class="button is-primary"
+                        title="Save"
+                        :disabled="trackname == undefined || trackname.length == 0"
+                        @click="routeSaveClick"
+                    >
                         <span class="icon"> <i class="fa fa-download"></i></span>
                     </button>
                 </div>
@@ -28,7 +28,7 @@
                         <span class="icon"> <i class="fas fa-file-download"></i></span>
                     </button>
                 </div>
-                <div class="control">
+                <!-- <div class="control">
                     <button
                         class="button is-primary"
                         title="Share route"
@@ -37,7 +37,7 @@
                     >
                         <span class="icon"> <i class="fa fa-share"></i></span>
                     </button>
-                </div>
+                </div> -->
             </div>
             <div id="modal-export" class="modal" :class="{ 'is-active': modal.export.show }">
                 <div class="modal-background"></div>
@@ -116,6 +116,7 @@
 
 <script>
 import { getRouteDownload } from '@/util/BRouter';
+import { mapActions } from 'vuex';
 
 export default {
     data() {
@@ -131,22 +132,35 @@ export default {
                     includePOIs: true,
                     url: ''
                 }
-            },
-            trackname: undefined
+            }
         };
     },
+    computed: {
+        trackname: {
+            get() {
+                return this.$store.state.trackname;
+            },
+            set(value) {
+                this.$store.commit('tracknameUpdate', value);
+            }
+        }
+    },
     methods: {
+        ...mapActions(['routeSave']),
+        routeSaveClick() {
+            console.log('routeSave:', this.trackname);
+            this.routeSave(this.trackname);
+        },
         shareModalShow() {
             this.modal.share.show = true;
             let shareUrl = getRouteDownload(this.trackname, this.modal.share).split('?')[1];
-            this.modal.share.url = `${location.href}?share=${shareUrl}`;
+            // shareUrl = btoa(shareUrl);
+            this.modal.share.url = `${location.href.replace('map', 'route')}?share=true&${shareUrl}`;
         },
         shareModalHide() {
             this.modal.share.show = false;
         },
         shareRouteTrigger() {
-            console.log(`shareUrl: ${this.modal.share.url}`);
-
             var copyText = document.getElementById('dummyClipboard');
             copyText.type = 'text';
             copyText.value = this.modal.share.url;

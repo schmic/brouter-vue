@@ -13,7 +13,7 @@ const url = {
 
 describe('BRouter', () => {
     beforeEach(() => {
-        store.commit('stateMerge', stateMock);
+        store.commit('stateRestore', stateMock);
     });
     it('state is correct', () => {
         expect(store.state.waypoints.length).toBe(3);
