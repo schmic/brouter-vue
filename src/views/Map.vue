@@ -193,6 +193,7 @@
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex';
 import { latLng } from 'leaflet';
 
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
@@ -259,12 +260,9 @@ export default {
         let defaultCenter = JSON.stringify(this.center);
         this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
     },
-    // mounted() {
-    //     this.$nextTick(() => {
-    //         this.$refs.map.mapObject.ANY_LEAFLET_MAP_METHOD();
-    //     });
-    // },
     methods: {
+        ...mapMutations(['nogoUpdate', 'poiUpdate', 'waypointsUpdate', 'segmentsUpdate']),
+        ...mapActions(['routeClear']),
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
@@ -277,16 +275,16 @@ export default {
             });
             this.$store.state.nogos.forEach(nogo => {
                 nogo = this._createNoGo(nogo.latlng, { radius: nogo.radius }, this.$refs.map.mapObject);
-                this.$store.commit('nogoUpdate', nogo);
+                this.nogoUpdate(nogo);
             });
             this.$store.state.pois.forEach(poi => {
                 poi = this._createPOI(poi.latlng, {}, this.$refs.map.mapObject);
-                this.$store.commit('poiUpdate', poi);
+                this.poiUpdate(poi);
             });
 
             this.trackDrawer.on('TrackDrawer:done', () => {
-                this.$store.commit('waypointsUpdate', this.trackDrawer.getNodes());
-                this.$store.commit('segmentsUpdate', this.trackDrawer.getSteps());
+                this.waypointsUpdate(this.trackDrawer.getNodes());
+                this.segmentsUpdate(this.trackDrawer.getSteps());
             });
         },
         onMapZoomChanged(zoom) {
@@ -303,12 +301,12 @@ export default {
             if (this.toolBarMode === 'nogo') {
                 this.toolBarMode = undefined;
                 let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, map);
-                this.$store.commit('nogoUpdate', nogo);
-                this.trackDrawer.refreshEdges();
+                this.nogoUpdate(nogo);
+                this.refreshEdges();
             } else if (this.toolBarMode === 'poi') {
                 this.toolBarMode = undefined;
                 let poi = this._createPOI(evt.latlng, {}, map);
-                this.$store.commit('poiUpdate', poi);
+                this.poiUpdate(poi);
             }
         },
         setTileprovider(provider) {
@@ -318,8 +316,11 @@ export default {
             });
         },
         onRouteClear() {
-            this.$store.dispatch('routeClear');
+            this.routeClear();
             location.reload();
+        },
+        refreshEdges() {
+            this.trackDrawer.refreshEdges();
         },
         _createPOI(latlng, options, map) {
             options = {
@@ -339,7 +340,7 @@ export default {
                 window.L.DomEvent.stop(evt);
                 if (this.toolBarMode == 'delete') {
                     poi.remove();
-                    this.$store.commit('poiRemove', poi);
+                    this.poiRemove(poi);
                 }
             });
         },
@@ -354,15 +355,15 @@ export default {
                     window.L.DomEvent.stop(evt);
                     if (this.toolBarMode == 'delete') {
                         evt.target.remove();
-                        this.$store.commit('nogoRemove', evt.target);
+                        this.nogoRemove(evt.target);
                     } else {
                         evt.target.toggleEdit();
                         if (evt.target.editEnabled()) {
                             evt.target.setStyle({ color: 'darkred' });
                         } else {
                             evt.target.setStyle({ color: '#3388ff' });
-                            this.$store.commit('nogoUpdate', evt.target);
-                            this.trackDrawer.refreshEdges();
+                            this.nogoUpdate(evt.target);
+                            this.refreshEdges();
                         }
                     }
                 });
