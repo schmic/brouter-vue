@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 
 import Lockr from 'lockr';
 
+import LockrPlugin from './plugin/lockr';
+
 import POI from '@/model/POI';
 import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
@@ -11,15 +13,16 @@ import Waypoint from '@/model/Waypoint';
 import { statsCalc, statsReset } from '@/store/stats';
 
 Vue.use(Vuex);
-Lockr.prefix = 'brtr_';
 
 export default new Vuex.Store({
+    plugins: [LockrPlugin],
     state: {
-        trackname: undefined,
-        waypoints: [],
-        segments: [],
-        nogos: [],
-        pois: [],
+        trackname: Lockr.get('state/trackname', undefined),
+        alternativeIdx: Lockr.get('state/alternativeIdx', 0),
+        profile: Lockr.get(`state/profile`, 'fastbike'),
+        waypoints: Lockr.get('state/waypoints', []),
+        nogos: Lockr.get('state/nogos', []),
+        pois: Lockr.get('state/pois', []),
         stats: {
             distance: 0,
             totaltime: 0,
@@ -27,9 +30,12 @@ export default new Vuex.Store({
             ascend: 0,
             descend: 0
         },
-        routes: []
+        routes: Lockr.get('routes', [])
     },
     mutations: {
+        alternativeIdxUpdate(state, alternativeIdx) {
+            state.alternativeIdx = alternativeIdx;
+        },
         routesUpdate(state, routes) {
             state.routes = routes;
         },
@@ -81,33 +87,9 @@ export default new Vuex.Store({
                     )
             );
             state.segments.length ? statsCalc(state) : statsReset(state);
-        },
-        stateRestore(state, newState) {
-            this.replaceState({ ...state, ...newState });
-        },
-        stateSave(state) {
-            ['trackname', 'waypoints', 'nogos', 'pois'].forEach(it =>
-                localStorage.setItem(`state/${it}`, JSON.stringify(state[it]))
-            );
         }
     },
     actions: {
-        stateRestore({ commit }) {
-            const trackname = localStorage.getItem('state/trackname');
-            commit('stateRestore', {
-                trackname: trackname && trackname != 'undefined' ? JSON.parse(trackname) : undefined,
-                waypoints: JSON.parse(localStorage.getItem('state/waypoints') || '[]'),
-                nogos: JSON.parse(localStorage.getItem('state/nogos') || '[]'),
-                pois: JSON.parse(localStorage.getItem('state/pois') || '[]'),
-                routes: Lockr.get('routes')
-            });
-        },
-        stateSave({ commit }, triggeredMutation) {
-            triggeredMutation.type.startsWith('trackname') && commit('stateSave');
-            triggeredMutation.type.startsWith('waypoint') && commit('stateSave');
-            triggeredMutation.type.startsWith('nogo') && commit('stateSave');
-            triggeredMutation.type.startsWith('poi') && commit('stateSave');
-        },
         waypointsClear({ commit }) {
             commit('waypointsUpdate', []);
         },

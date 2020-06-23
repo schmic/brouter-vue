@@ -66,15 +66,30 @@ function buildUrl(lonlats, nogos, pois, options) {
 
 function getRouteDownload(trackname, options) {
     trackname = trackname || `brouter-vue`;
+
     let nogos = store.state.nogos;
     let pois = options.includePOIs ? store.state.pois : [];
     let waypoints = store.state.waypoints.map(waypoint => waypoint.latlng);
+
+    options = {
+        ...{
+            alternativeidx: store.state.alternativeIdx,
+            profile: store.state.profile
+        },
+        ...options
+    };
+
     return buildUrl(waypoints, nogos, pois, { trackname: trackname, ...options });
 }
 
 async function getRouteSegment(from, to) {
     let nogos = store.state.nogos;
-    let url = buildUrl([from, to], nogos);
+    let pois = [];
+    let options = {
+        alternativeidx: store.state.alternativeIdx,
+        profile: store.state.profile
+    };
+    let url = buildUrl([from, to], nogos, pois, options);
 
     let response = await fetch(url);
     let data = await response.json();
