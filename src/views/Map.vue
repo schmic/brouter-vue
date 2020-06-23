@@ -1,6 +1,6 @@
 <template>
     <div class="columns is-mobile">
-        <div v-if="showSidebar" class="column is-one-quarter">
+        <div v-if="showSidebar" class="column is-one-quarter-desktop is-one-half-tablet is-three-quarters-mobile">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <waypoint-list></waypoint-list>
