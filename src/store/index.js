@@ -10,7 +10,7 @@ import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
 import Waypoint from '@/model/Waypoint';
 
-import { statsCalc, statsReset } from '@/store/stats';
+import { statsCalc, statsReset } from '@/store/helpers/stats';
 
 Vue.use(Vuex);
 
@@ -35,6 +35,9 @@ export default new Vuex.Store({
     mutations: {
         alternativeIdxUpdate(state, alternativeIdx) {
             state.alternativeIdx = alternativeIdx;
+        },
+        profileUpdate(state, profile) {
+            state.profile = profile;
         },
         routesUpdate(state, routes) {
             state.routes = routes;

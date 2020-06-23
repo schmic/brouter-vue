@@ -40,6 +40,7 @@
                 </div> -->
             </div>
             <route-alternative></route-alternative>
+            <route-profile></route-profile>
             <div id="modal-export" class="modal" :class="{ 'is-active': modal.export.show }">
                 <div class="modal-background"></div>
                 <div class="modal-card">
@@ -120,10 +121,12 @@ import { getRouteDownload } from '@/util/BRouter';
 import { mapActions } from 'vuex';
 
 import RouteAlternative from '@/components/RouteAlternative';
+import RouteProfile from '@/components/RouteProfile';
 
 export default {
     components: {
-        RouteAlternative
+        RouteAlternative,
+        RouteProfile
     },
     data() {
         return {
