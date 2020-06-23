@@ -25,7 +25,7 @@ const TileProviders = [
         }
     },
     {
-        name: 'Cycloosm',
+        name: 'CycloOSM',
         visible: false,
         url: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
         options: {
