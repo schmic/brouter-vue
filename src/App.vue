@@ -1,23 +1,21 @@
 <template>
     <div id="app">
-        <nav class="navbar is-primary">
-            <div class="navbar-brand">
+        <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+            <div id="navMenuBrand" class="navbar-brand">
                 <router-link class="navbar-item" to="/">
                     BRouter-Vue <small style="margin-left: 0.5em">v{{ version }}</small></router-link
                 >
-
-                <a class="navbar-item is-hidden-desktop" href="https://github.com/schmic/brouter-vue" target="_blank">
-                    <span class="icon" style="color: #333;">
-                        <i class="fab fa-github"></i>
-                    </span>
-                </a>
-                <div class="navbar-burger burger" data-target="navMenuTop">
+                <div
+                    class="navbar-burger burger"
+                    :class="{ 'is-active': navbarIsActive }"
+                    @click="navbarIsActive = !navbarIsActive"
+                >
                     <span></span>
                     <span></span>
                     <span></span>
                 </div>
             </div>
-            <div id="navMenuTop" class="navbar-menu">
+            <div id="navMenuTop" class="navbar-menu" :class="{ 'is-active': navbarIsActive }">
                 <div class="navbar-start">
                     <router-link class="navbar-item" to="/map">Map</router-link>
                     <router-link class="navbar-item" to="/route">Routes</router-link>
@@ -102,6 +100,7 @@ import { version } from '../package.json';
 export default {
     data() {
         return {
+            navbarIsActive: false,
             version: version
         };
     }
