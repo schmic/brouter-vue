@@ -287,6 +287,12 @@ export default {
                 this.waypointsUpdate(this.trackDrawer.getNodes());
                 this.segmentsUpdate(this.trackDrawer.getSteps());
             });
+
+            this.$store.subscribe(mutation => {
+                // this does not feel right here
+                if (mutation.type == 'alternativeIdxUpdate') this.refreshEdges();
+                if (mutation.type == 'profileUpdate') this.refreshEdges();
+            });
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;

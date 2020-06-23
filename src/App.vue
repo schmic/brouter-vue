@@ -116,7 +116,6 @@ body {
 #app {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-align: center;
 
     min-height: 100%;
     display: flex;

@@ -1,9 +1,24 @@
 <template>
-    <div class="select">
-        <select v-model="profile">
-            <option disabled value="">Please select profile</option>
-            <option v-for="p in profiles" :key="p">{{ p }}</option>
-        </select>
+    <div class="field has-addons">
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Profile</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <div class="select">
+                            <select v-model="profile">
+                                <option disabled value="">Please select profile</option>
+                                <option v-for="p in profiles" :key="p" :value="p">{{
+                                    $t(`routing.profiles.${p}`)
+                                }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -19,13 +34,11 @@ export default {
                 'car-fast',
                 'car-test',
                 'car-vario',
-                'dummy',
                 'fastbike-asia-pacific',
                 'fastbike',
                 'fastbike-lowtraffic',
                 'fastbike-verylowtraffic',
                 'hiking-beta',
-                'lookups',
                 'moped',
                 'rail',
                 'river',

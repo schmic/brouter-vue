@@ -1,13 +1,22 @@
 <template>
-    <div class="field has-addons">
-        <p v-for="alternative in alternatives" :key="alternative" class="control" @click="active = alternative">
-            <button class="button" :class="{ 'is-primary': alternative == active }">
-                <!-- <span class="icon is-small">
-                    <i class="fas fa-align-left"></i>
-                </span> -->
-                <span>{{ alternative + 1 }}</span>
-            </button>
-        </p>
+    <div class="field is-horizontal">
+        <div class="field-label">
+            <label class="label">Alternative</label>
+        </div>
+        <div class="field-body">
+            <div class="field is-narrow has-addons">
+                <div
+                    v-for="alternative in alternatives"
+                    :key="alternative"
+                    class="control"
+                    @click="active = alternative"
+                >
+                    <button class="button" :class="{ 'is-primary': alternative == active }">
+                        <span>{{ alternative + 1 }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
