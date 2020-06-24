@@ -3,7 +3,6 @@
         <div v-if="showSidebar" class="column is-one-quarter-desktop is-one-half-tablet is-three-quarters-mobile">
             <route-meta></route-meta>
             <track-meta></track-meta>
-            <waypoint-list></waypoint-list>
             <poi-list></poi-list>
         </div>
         <div class="column">
@@ -203,7 +202,6 @@ import TileProviders from '@/util/TileProviders';
 import RouteMeta from '@/components/RouteMeta.vue';
 import TrackMeta from '@/components/TrackMeta.vue';
 import PoiList from '@/components/PoiList.vue';
-import WaypointList from '@/components/WaypointList.vue';
 
 export default {
     name: 'Map',
@@ -211,7 +209,6 @@ export default {
         RouteMeta,
         TrackMeta,
         PoiList,
-        WaypointList,
         LMap,
         LTileLayer,
         LControl
@@ -262,7 +259,7 @@ export default {
         this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
     },
     methods: {
-        ...mapMutations(['nogoUpdate', 'poiUpdate', 'waypointsUpdate', 'segmentsUpdate']),
+        ...mapMutations(['nogoUpdate', 'poiUpdate', 'poiRemove', 'waypointsUpdate', 'segmentsUpdate']),
         ...mapActions(['routeClear']),
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
