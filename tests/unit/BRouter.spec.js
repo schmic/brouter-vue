@@ -11,6 +11,10 @@ const url = {
     }
 };
 
+const lonlats = [state.waypoints[0].latlng, state.waypoints[1].latlng];
+const nogos = state.nogos;
+const pois = state.waypoints;
+
 describe('BRouter', () => {
     beforeEach(() => {});
 
@@ -19,19 +23,23 @@ describe('BRouter', () => {
         expect(state.nogos.length).toBe(2);
     });
 
-    it('generates URL with lonlats', () => {
-        let from = state.waypoints[0];
-        let to = state.waypoints[1];
-        let fetchURL = buildUrl([from.latlng, to.latlng]);
-        expect(fetchURL).toContain(url.parts.lonlats);
+    describe('segment urls', () => {
+        it('should contain lonlats', () => {
+            let fetchURL = buildUrl(lonlats);
+            expect(fetchURL).toContain(url.parts.lonlats);
+        });
+
+        it('should contain lonlats and nogos', () => {
+            let fetchURL = buildUrl(lonlats, nogos);
+            expect(fetchURL).toContain(url.parts.lonlats);
+            expect(fetchURL).toContain(url.parts.nogos);
+        });
     });
 
-    it('generates URL with lonlats and nogos', () => {
-        let from = state.waypoints[0];
-        let to = state.waypoints[1];
-        let nogos = state.nogos;
-        let fetchURL = buildUrl([from.latlng, to.latlng], nogos);
-        expect(fetchURL).toContain(url.parts.lonlats);
-        expect(fetchURL).toContain(url.parts.nogos);
+    describe('download urls', () => {
+        it('should export as gpx', () => {
+            let fetchURL = buildUrl(lonlats, nogos, pois, { format: 'gpx' });
+            expect(fetchURL).toContain('format=gpx');
+        });
     });
 });

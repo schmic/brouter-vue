@@ -14,8 +14,6 @@
  */
 
 const settings = {
-    //     URL_TEMPLATE:
-    //         '/brouter?lonlats={lonlats}&nogos={nogos}&polylines={polylines}&polygons={polygons}&profile={profile}&alternativeidx={alternativeidx}&format={format}',
     PRECISION: 6
     //     NUMBER_SEPARATOR: ',',
     //     GROUP_SEPARATOR: '|'
@@ -23,6 +21,14 @@ const settings = {
 
 import store from '@/store';
 
+/**
+ * Generate a URL to fetch data from the BRouter backend service
+ *
+ * @param {Array} lonlats
+ * @param {Array} nogos
+ * @param {Array} pois
+ * @param {Object} options
+ */
 function buildUrl(lonlats, nogos, pois, options) {
     options = options || {};
     options = { ...{ profile: 'fastbike', alternativeidx: 0, format: 'geojson' }, ...options };
@@ -37,10 +43,10 @@ function buildUrl(lonlats, nogos, pois, options) {
     if (options.trackname) url += `&trackname=${options.trackname}`;
 
     pois = (pois || [])
-        .map(poi => {
-            return `${poi.latlng.lng.toFixed(settings.PRECISION)},${poi.latlng.lat.toFixed(settings.PRECISION)},${
-                poi.name
-            }`;
+        .map((poi, index) => {
+            return `${poi.latlng.lng.toFixed(settings.PRECISION)},${poi.latlng.lat.toFixed(
+                settings.PRECISION
+            )},${poi.name || index}`;
         })
         .join('|');
     if (pois) url += `&pois=${pois}`;
@@ -82,29 +88,26 @@ function getRouteDownload(trackname, options) {
     return buildUrl(waypoints, nogos, pois, { trackname: trackname, ...options });
 }
 
-async function getRouteSegment(from, to) {
+function getRouteSegment(from, to) {
     let nogos = store.state.nogos;
     let pois = [];
     let options = {
         alternativeidx: store.state.alternativeIdx,
         profile: store.state.profile
     };
-    let url = buildUrl([from, to], nogos, pois, options);
-
-    let response = await fetch(url);
-    let data = await response.json();
-    return data;
+    return buildUrl([from, to], nogos, pois, options);
 }
 
-function route(markerStart, markerEnd, done) {
-    getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng())
-        .then(data => {
-            done(null, data);
-        })
-        .catch(error => {
-            done(error);
-            console.log('fetch.error', error);
-        });
+async function route(markerStart, markerEnd, done) {
+    const url = getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng());
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+        done(null, data);
+    } catch (e) {
+        console.log('fetch.error', e);
+        done(e);
+    }
 }
 
 const BRouter = {
@@ -112,4 +115,4 @@ const BRouter = {
 };
 
 export default BRouter;
-export { route, buildUrl, getRouteDownload }; // make testable
+export { buildUrl, getRouteSegment, getRouteDownload }; // make testable
