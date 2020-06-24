@@ -4,7 +4,14 @@
             POIs
         </div>
         <div class="message-body">
-            <table class="table is-fullwidth">
+            <div v-if="!pois.length" class="notification is-warning">
+                No POIs yet, use the
+                <span class="icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </span>
+                icon in the toolbar of the map create some.
+            </div>
+            <table v-if="pois.length" class="table is-fullwidth">
                 <tr>
                     <th>Name</th>
                     <th>Lat</th>
