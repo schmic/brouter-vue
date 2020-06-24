@@ -1,6 +1,6 @@
-import { buildUrl } from '@/util/BRouter';
-import store from '@/store';
-import stateMock from '../state.mock';
+import { buildUrl } from '../../src/util/BRouter';
+
+import state from '../state.mock';
 
 const url = {
     parts: {
@@ -12,25 +12,24 @@ const url = {
 };
 
 describe('BRouter', () => {
-    beforeEach(() => {
-        store.commit('stateRestore', stateMock);
-    });
+    beforeEach(() => {});
+
     it('state is correct', () => {
-        expect(store.state.waypoints.length).toBe(3);
-        expect(store.state.nogos.length).toBe(2);
+        expect(state.waypoints.length).toBe(3);
+        expect(state.nogos.length).toBe(2);
     });
 
     it('generates URL with lonlats', () => {
-        let from = store.state.waypoints[0];
-        let to = store.state.waypoints[1];
+        let from = state.waypoints[0];
+        let to = state.waypoints[1];
         let fetchURL = buildUrl([from.latlng, to.latlng]);
         expect(fetchURL).toContain(url.parts.lonlats);
     });
 
     it('generates URL with lonlats and nogos', () => {
-        let from = store.state.waypoints[0];
-        let to = store.state.waypoints[1];
-        let nogos = store.state.nogos;
+        let from = state.waypoints[0];
+        let to = state.waypoints[1];
+        let nogos = state.nogos;
         let fetchURL = buildUrl([from.latlng, to.latlng], nogos);
         expect(fetchURL).toContain(url.parts.lonlats);
         expect(fetchURL).toContain(url.parts.nogos);
