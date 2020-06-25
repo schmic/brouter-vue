@@ -1,6 +1,6 @@
 <template>
-    <div class="columns is-mobile">
-        <div v-if="showSidebar" id="map-sidebar" class="column">
+    <div class="columns">
+        <div v-if="showSidebar" id="map-sidebar" class="column is-four-fifths-mobile">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <poi-list></poi-list>
@@ -271,6 +271,9 @@ export default {
     methods: {
         ...mapMutations(['nogoUpdate', 'poiUpdate', 'poiRemove', 'waypointsUpdate', 'segmentsUpdate']),
         ...mapActions(['routeClear']),
+        onLoad(evt) {
+            console.log('evt', evt);
+        },
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
@@ -389,13 +392,13 @@ export default {
 <style>
 .columns {
     flex-grow: 1;
+    display: flex;
 }
 
 #map-sidebar {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    /* TODO: #5 add media queries for the width */
     flex: 0 0 450px;
     max-width: 450px;
     width: auto;
