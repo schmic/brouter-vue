@@ -1,5 +1,5 @@
 <template>
-    <article class="message is-dark">
+    <article class="message is-primary">
         <div class="message-header">
             Statistic
         </div>
