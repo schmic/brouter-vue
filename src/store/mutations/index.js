@@ -57,5 +57,10 @@ export const mutations = {
                 new Segment(edge._leaflet_id, edge._startMarkerId, edge._endMarkerId, edge.getLatLngs(), edge.options)
         );
         state.segments.length ? statsCalc(state) : statsReset(state);
+    },
+    routeLoad(state, route) {
+        ['trackname', 'alternativeIdx', 'profile', 'waypoints', 'nogos', 'pois', 'stats'].forEach(
+            it => (state[it] = route[it])
+        );
     }
 };

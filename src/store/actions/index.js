@@ -28,7 +28,7 @@ export const actions = {
     },
     routeLoad({ commit }, trackname) {
         const route = Lockr.get(`route_${trackname}`);
-        commit('stateRestore', route);
+        commit('routeLoad', route);
     },
     routeRemove({ commit, dispatch }, trackname) {
         Lockr.srem('routes', trackname);

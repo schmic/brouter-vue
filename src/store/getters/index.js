@@ -4,6 +4,8 @@ export const getters = {
     currentRoute(state) {
         return {
             trackname: state.trackname,
+            alternativeIdx: state.alternativeIdx,
+            profile: state.profile,
             waypoints: state.waypoints,
             nogos: state.nogos,
             pois: state.pois,
