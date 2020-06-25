@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
             <div id="navMenuBrand" class="navbar-brand">
                 <router-link class="navbar-item" to="/">
                     BRouter-Vue <small style="margin-left: 0.5em">v{{ version }}</small></router-link
