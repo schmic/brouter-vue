@@ -1,192 +1,202 @@
 <template>
     <div class="columns is-mobile">
-        <div v-if="showSidebar" class="column is-one-quarter-desktop is-one-half-tablet is-three-quarters-mobile">
+        <div v-if="showSidebar" id="map-sidebar" class="column">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <poi-list></poi-list>
         </div>
-        <div class="column">
-            <l-map
-                ref="map"
-                :style="{ cursor: toolBarMode != undefined ? 'crosshair' : 'default' }"
-                :zoom="zoom"
-                :center="center"
-                :options="mapOptions"
-                @ready="onMapReady"
-                @update:center="onMapCenterChanged"
-                @update:zoom="onMapZoomChanged"
-                @click="onMapClicked"
-            >
-                <l-tile-layer
-                    v-for="tileProvider in tileProviders"
-                    :key="tileProvider.name"
-                    :name="tileProvider.name"
-                    :visible="tileProvider.visible"
-                    :url="tileProvider.url"
-                    :attribution="tileProvider.options.attribution"
-                    layer-type="base"
-                />
-                <l-control position="topleft">
-                    <button
-                        class="button is-primary"
-                        @click="
-                            showSidebar = !showSidebar;
-                            $refs.map.mapObject._onResize();
-                        "
-                    >
-                        <span class="icon">
-                            <i class="fa" :class="showSidebar ? 'fa-angle-left' : 'fa-angle-right'"></i>
-                        </span>
-                    </button>
-                    <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
-                        <div class="dropdown-trigger">
+        <div id="map-column" class="column">
+            <div id="map-wrapper" class="column">
+                <l-map
+                    ref="map"
+                    :style="{ cursor: toolBarMode != undefined ? 'crosshair' : 'default' }"
+                    :zoom="zoom"
+                    :center="center"
+                    :options="mapOptions"
+                    @ready="onMapReady"
+                    @update:center="onMapCenterChanged"
+                    @update:zoom="onMapZoomChanged"
+                    @click="onMapClicked"
+                >
+                    <l-tile-layer
+                        v-for="tileProvider in tileProviders"
+                        :key="tileProvider.name"
+                        :name="tileProvider.name"
+                        :visible="tileProvider.visible"
+                        :url="tileProvider.url"
+                        :attribution="tileProvider.options.attribution"
+                        layer-type="base"
+                    />
+                    <l-control position="topleft">
+                        <button
+                            class="button is-primary"
+                            @click="
+                                showSidebar = !showSidebar;
+                                $refs.map.mapObject._onResize();
+                            "
+                        >
+                            <span class="icon">
+                                <i class="fa" :class="showSidebar ? 'fa-angle-left' : 'fa-angle-right'"></i>
+                            </span>
+                        </button>
+                        <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
+                            <div class="dropdown-trigger">
+                                <button
+                                    class="button is-primary"
+                                    aria-haspopup="true"
+                                    aria-controls="dropdown-menu"
+                                    @click="dropDown.menu = !dropDown.menu"
+                                >
+                                    <span class="icon">
+                                        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div id="dropdown-menu" class="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <a
+                                        class="dropdown-item is-small"
+                                        @click="
+                                            dropDown.menu = false;
+                                            onRouteClear();
+                                        "
+                                    >
+                                        Clear route
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown" :class="{ 'is-active': dropDown.tileProvider }">
+                            <div class="dropdown-trigger">
+                                <button
+                                    aria-haspopup="true"
+                                    class="button is-small is-primary"
+                                    aria-controls="dropdown-tileprovider"
+                                    @click="dropDown.tileProvider = !dropDown.tileProvider"
+                                >
+                                    <span>Map Providers</span>
+                                    <span class="icon is-small">
+                                        <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div id="dropdown-tileprovider" class="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <a
+                                        v-for="tileProvider in tileProviders"
+                                        :key="tileProvider.id"
+                                        class="dropdown-item is-small"
+                                        :class="{ 'is-active': tileProvider.visible }"
+                                        @click="
+                                            setTileprovider(tileProvider);
+                                            tileProviderDropDown = false;
+                                        "
+                                    >
+                                        {{ tileProvider.name }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </l-control>
+                    <l-control position="topright"> </l-control>
+                    <l-control position="bottomleft">
+                        <div v-shortkey="['esc']" class="buttons has-addons" @shortkey="toolBarMode = undefined">
                             <button
-                                class="button is-primary"
-                                aria-haspopup="true"
-                                aria-controls="dropdown-menu"
-                                @click="dropDown.menu = !dropDown.menu"
+                                v-shortkey="['x']"
+                                class="button is-dark is-rounded"
+                                title="Remove something (d)"
+                                :class="{ 'is-primary': toolBarMode === 'delete' }"
+                                @shortkey="toolBarMode = 'delete'"
+                                @click="toolBarMode = 'delete'"
                             >
                                 <span class="icon">
-                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                    <i class="fa fa-trash"></i>
                                 </span>
                             </button>
-                        </div>
-                        <div id="dropdown-menu" class="dropdown-menu" role="menu">
-                            <div class="dropdown-content">
-                                <a
-                                    class="dropdown-item is-small"
-                                    @click="
-                                        dropDown.menu = false;
-                                        onRouteClear();
-                                    "
-                                >
-                                    Clear route
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dropdown" :class="{ 'is-active': dropDown.tileProvider }">
-                        <div class="dropdown-trigger">
                             <button
-                                aria-haspopup="true"
-                                class="button is-small is-primary"
-                                aria-controls="dropdown-tileprovider"
-                                @click="dropDown.tileProvider = !dropDown.tileProvider"
+                                v-shortkey="['n']"
+                                class="button is-dark is-rounded"
+                                title="Add NoGo area (n)"
+                                :class="{ 'is-primary': toolBarMode === 'nogo' }"
+                                @shortkey="toolBarMode = 'nogo'"
+                                @click="toolBarMode = 'nogo'"
                             >
-                                <span>Map Providers</span>
-                                <span class="icon is-small">
-                                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                <span class="icon">
+                                    <i class="fa fa-ban"></i>
+                                </span>
+                            </button>
+                            <button
+                                v-shortkey="['p']"
+                                class="button is-dark is-rounded"
+                                title="Add POI (p)"
+                                :class="{ 'is-primary': toolBarMode === 'poi' }"
+                                @shortkey="toolBarMode = 'poi'"
+                                @click="toolBarMode = 'poi'"
+                            >
+                                <span class="icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </span>
+                            </button>
+                            <button
+                                v-shortkey="['s']"
+                                class="button is-dark is-rounded"
+                                title="Split route (s)"
+                                :class="{ 'is-primary': toolBarMode === 'insert' }"
+                                @shortkey="toolBarMode = 'insert'"
+                                @click="toolBarMode = 'insert'"
+                            >
+                                <span class="icon">
+                                    <i class="fa fa-cut"></i>
+                                </span>
+                            </button>
+                            <button
+                                v-shortkey="['o']"
+                                class="button is-dark is-rounded"
+                                title="Change waypoint to sleepover (o)"
+                                :class="{ 'is-primary': toolBarMode === 'promote' }"
+                                @shortkey="toolBarMode = 'promote'"
+                                @click="toolBarMode = 'promote'"
+                            >
+                                <span class="icon">
+                                    <i class="fa fa-bed"></i>
+                                </span>
+                            </button>
+                            <button
+                                v-shortkey="['shift', 'o']"
+                                class="button is-dark is-rounded"
+                                title="Change sleepover to waypoint (Shift+o)"
+                                :class="{ 'is-primary': toolBarMode === 'demote' }"
+                                @shortkey="toolBarMode = 'demote'"
+                                @click="toolBarMode = 'demote'"
+                            >
+                                <span class="icon">
+                                    <i class="fa fa-map-signs"></i>
+                                </span>
+                            </button>
+                            <button
+                                v-shortkey="['w']"
+                                class="button is-dark is-rounded"
+                                title="Add waypoint (w)"
+                                :class="{ 'is-primary': toolBarMode === 'add' }"
+                                @shortkey="toolBarMode = 'add'"
+                                @click="toolBarMode = 'add'"
+                            >
+                                <span class="icon">
+                                    <i class="fa fa-pen"></i>
                                 </span>
                             </button>
                         </div>
-                        <div id="dropdown-tileprovider" class="dropdown-menu" role="menu">
-                            <div class="dropdown-content">
-                                <a
-                                    v-for="tileProvider in tileProviders"
-                                    :key="tileProvider.id"
-                                    class="dropdown-item is-small"
-                                    :class="{ 'is-active': tileProvider.visible }"
-                                    @click="
-                                        setTileprovider(tileProvider);
-                                        tileProviderDropDown = false;
-                                    "
-                                >
-                                    {{ tileProvider.name }}
-                                </a>
-                            </div>
-                        </div>
+                    </l-control>
+                </l-map>
+            </div>
+            <div id="map-footer" class="level">
+                <div class="level-item has-text-centered">
+                    <div>
+                        <p class="title">Footer</p>
+                        <p class="heading">for the map</p>
                     </div>
-                </l-control>
-                <l-control position="topright"> </l-control>
-                <l-control position="bottomleft">
-                    <div v-shortkey="['esc']" class="buttons has-addons" @shortkey="toolBarMode = undefined">
-                        <button
-                            v-shortkey="['x']"
-                            class="button is-dark is-rounded"
-                            title="Remove something (d)"
-                            :class="{ 'is-primary': toolBarMode === 'delete' }"
-                            @shortkey="toolBarMode = 'delete'"
-                            @click="toolBarMode = 'delete'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-trash"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['n']"
-                            class="button is-dark is-rounded"
-                            title="Add NoGo area (n)"
-                            :class="{ 'is-primary': toolBarMode === 'nogo' }"
-                            @shortkey="toolBarMode = 'nogo'"
-                            @click="toolBarMode = 'nogo'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-ban"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['p']"
-                            class="button is-dark is-rounded"
-                            title="Add POI (p)"
-                            :class="{ 'is-primary': toolBarMode === 'poi' }"
-                            @shortkey="toolBarMode = 'poi'"
-                            @click="toolBarMode = 'poi'"
-                        >
-                            <span class="icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['s']"
-                            class="button is-dark is-rounded"
-                            title="Split route (s)"
-                            :class="{ 'is-primary': toolBarMode === 'insert' }"
-                            @shortkey="toolBarMode = 'insert'"
-                            @click="toolBarMode = 'insert'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-cut"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['o']"
-                            class="button is-dark is-rounded"
-                            title="Change waypoint to sleepover (o)"
-                            :class="{ 'is-primary': toolBarMode === 'promote' }"
-                            @shortkey="toolBarMode = 'promote'"
-                            @click="toolBarMode = 'promote'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-bed"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['shift', 'o']"
-                            class="button is-dark is-rounded"
-                            title="Change sleepover to waypoint (Shift+o)"
-                            :class="{ 'is-primary': toolBarMode === 'demote' }"
-                            @shortkey="toolBarMode = 'demote'"
-                            @click="toolBarMode = 'demote'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-map-signs"></i>
-                            </span>
-                        </button>
-                        <button
-                            v-shortkey="['w']"
-                            class="button is-dark is-rounded"
-                            title="Add waypoint (w)"
-                            :class="{ 'is-primary': toolBarMode === 'add' }"
-                            @shortkey="toolBarMode = 'add'"
-                            @click="toolBarMode = 'add'"
-                        >
-                            <span class="icon">
-                                <i class="fa fa-pen"></i>
-                            </span>
-                        </button>
-                    </div>
-                </l-control>
-            </l-map>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -377,11 +387,33 @@ export default {
 </script>
 
 <style>
-.container,
 .columns {
-    flex: 1;
+    flex-grow: 1;
 }
-.columns > .column {
-    padding-bottom: 0;
+
+#map-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* TODO: #5 add media queries for the width */
+    flex: 0 0 450px;
+    max-width: 450px;
+    width: auto;
+}
+
+#map-column {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+#map-wrapper {
+    display: flex;
+    flex-grow: 4;
+    padding-left: 0;
+}
+
+#map-footer {
+    display: none;
 }
 </style>

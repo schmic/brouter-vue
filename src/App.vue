@@ -84,11 +84,13 @@
         <section class="section">
             <router-view />
         </section>
-        <footer class="level">
-            <div v-if="false" class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Tweets</p>
-                    <p class="title">3,456</p>
+        <footer>
+            <div class="level">
+                <div class="level-item has-text-centered">
+                    <div>
+                        <p class="title">Footer</p>
+                        <p class="heading">way below</p>
+                    </div>
                 </div>
             </div>
         </footer>
@@ -110,7 +112,8 @@ export default {
 html,
 body {
     height: 100%;
-    overflow: hidden;
+    overflow-x: hidden; /* bulma default */
+    overflow-y: auto; /* override bulma default: scroll */
 }
 
 #app {
@@ -118,18 +121,21 @@ body {
     -moz-osx-font-smoothing: grayscale;
 
     min-height: 100%;
+    height: 100%;
+
     display: flex;
-    flex-direction: column;
+    flex-flow: column nowrap;
+    align-items: stretch;
 }
 
 #app > section {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
+    height: 100%;
+    padding: 0.75rem;
 }
 
 #app > footer {
-    padding: 0.75rem 0;
+    display: none;
 }
 </style>
