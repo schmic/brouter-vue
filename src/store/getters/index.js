@@ -1,6 +1,6 @@
 import Lockr from 'lockr';
 
-export const getter = {
+export const getters = {
     currentRoute(state) {
         return {
             trackname: state.trackname,
