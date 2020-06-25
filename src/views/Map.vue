@@ -198,6 +198,7 @@
                 </div>
             </div>
         </div>
+        <div id="map-meta" class="column">Sidebar for more information</div>
     </div>
 </template>
 
@@ -417,6 +418,10 @@ export default {
 }
 
 #map-footer {
+    display: none;
+}
+
+#map-meta {
     display: none;
 }
 </style>
