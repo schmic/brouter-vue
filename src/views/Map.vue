@@ -1,6 +1,6 @@
 <template>
     <div class="columns">
-        <div v-if="showSidebar" id="map-sidebar" class="column is-four-fifths-mobile">
+        <div v-if="showSidebar" id="map-sidebar" class="column">
             <route-meta></route-meta>
             <track-meta></track-meta>
             <poi-list></poi-list>
@@ -400,9 +400,23 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    flex: 0 0 450px;
-    max-width: 450px;
     width: auto;
+}
+
+@media screen and (min-width: 768px) {
+    #map-sidebar {
+        flex: 0 0 450px;
+        max-width: 450px;
+        width: auto;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #map-sidebar {
+        flex: 0 0 350px;
+        max-width: 350px;
+        width: auto;
+    }
 }
 
 #map-column {
