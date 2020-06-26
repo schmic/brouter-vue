@@ -272,23 +272,23 @@ export default {
     methods: {
         ...mapMutations(['nogoUpdate', 'poiUpdate', 'poiRemove', 'waypointsUpdate', 'segmentsUpdate']),
         ...mapActions(['routeClear']),
-        onLoad(evt) {
-            console.log('evt', evt);
-        },
         onMapReady() {
             this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
 
             // import
             this.$store.state.waypoints.forEach(waypoint => {
+                waypoint.options = waypoint.options || { type: 'waypoint' };
                 let marker = window.L.TrackDrawer.node(waypoint.latlng).setType(waypoint.options.type);
                 this.trackDrawerToolBar._bindMarkerEvents(marker);
                 this.trackDrawer.addNode(marker);
             });
+
             this.$store.state.nogos.forEach(nogo => {
                 nogo = this._createNoGo(nogo.latlng, { radius: nogo.radius }, this.$refs.map.mapObject);
                 this.nogoUpdate(nogo);
             });
+
             this.$store.state.pois.forEach(poi => {
                 poi = this._createPOI(poi.latlng, {}, this.$refs.map.mapObject);
                 this.poiUpdate(poi);
@@ -303,6 +303,7 @@ export default {
                 // this does not feel right here
                 if (mutation.type == 'alternativeIdxUpdate') this.refreshEdges();
                 if (mutation.type == 'profileUpdate') this.refreshEdges();
+                if (mutation.type == 'routeLoad') this.refreshEdges();
             });
         },
         onMapZoomChanged(zoom) {

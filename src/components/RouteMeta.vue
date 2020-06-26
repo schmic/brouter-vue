@@ -28,16 +28,16 @@
                         <span class="icon"> <i class="fas fa-file-download"></i></span>
                     </button>
                 </div>
-                <!-- <div class="control">
+                <div class="control">
                     <button
                         class="button is-primary"
-                        title="Share route"
+                        title="Share current route as is"
                         :disabled="trackname == undefined || trackname.length == 0"
                         @click="shareModalShow"
                     >
                         <span class="icon"> <i class="fa fa-share"></i></span>
                     </button>
-                </div> -->
+                </div>
             </div>
             <route-alternative></route-alternative>
             <route-profile></route-profile>
@@ -118,7 +118,7 @@
 
 <script>
 import { getRouteDownload } from '@/util/BRouter';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 import RouteAlternative from '@/components/RouteAlternative';
 import RouteProfile from '@/components/RouteProfile';
@@ -156,15 +156,14 @@ export default {
     },
     methods: {
         ...mapActions(['routeSave']),
+        ...mapGetters(['routeShareCurrent']),
         routeSaveClick() {
-            console.log('routeSave:', this.trackname);
             this.routeSave(this.trackname);
         },
         shareModalShow() {
             this.modal.share.show = true;
-            let shareUrl = getRouteDownload(this.trackname, this.modal.share).split('?')[1];
-            // shareUrl = btoa(shareUrl);
-            this.modal.share.url = `${location.href.replace('map', 'route')}?share=true&${shareUrl}`;
+            let shareUrl = this.routeShareCurrent();
+            this.modal.share.url = `${location.href.replace('map', 'route')}?share=${shareUrl}`;
         },
         shareModalHide() {
             this.modal.share.show = false;

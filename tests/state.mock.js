@@ -63,9 +63,9 @@ const state = {
         { id: 449, name: 'TODO: NoGo name', latlng: { lat: 49.123456, lng: 8.123456 }, radius: 1200 }
     ],
     pois: [
-        { id: 450, name: 'TODO:  Name', latlng: { lat: 49.67243245469188, lng: 8.698514726319036 } },
-        { id: 453, name: 'TODO:  Name', latlng: { lat: 49.696871366603204, lng: 8.522688759643914 } },
-        { id: 456, name: 'TODO:  Name', latlng: { lat: 49.61951348553559, lng: 8.48491364961603 } }
+        { id: 450, name: 'TODO:  Name 1', latlng: { lat: 49.67243245469188, lng: 8.698514726319036 } },
+        { id: 453, name: 'TODO:  Name 2', latlng: { lat: 49.696871366603204, lng: 8.522688759643914 } },
+        { id: 456, name: 'TODO:  Name 3', latlng: { lat: 49.61951348553559, lng: 8.48491364961603 } }
     ],
     stats: { distance: 44446, totaltime: 11060, formattedtime: '3:04', ascend: 782, descend: 556 }
 };

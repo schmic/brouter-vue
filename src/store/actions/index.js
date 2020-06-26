@@ -19,11 +19,19 @@ export const actions = {
         dispatch('nogosClear', []);
         dispatch('poisClear', []);
     },
-    routeSave({ commit }, trackname) {
-        commit('tracknameUpdate', trackname);
-        const route = this.getters.currentRoute;
-        Lockr.sadd('routes', route.trackname);
-        Lockr.set(`route_${route.trackname}`, route);
+    routeSave({ commit }, routeOrTrackname) {
+        let route, trackname;
+        if (typeof routeOrTrackname === 'string') {
+            route = this.getters.currentRoute;
+            trackname = routeOrTrackname;
+            commit('tracknameUpdate', trackname);
+        } else {
+            route = routeOrTrackname;
+            trackname = route.trackname;
+        }
+        console.log('trackname, route', trackname, route);
+        Lockr.sadd('routes', trackname);
+        Lockr.set(`route_${trackname}`, route);
         commit('routesUpdate', Lockr.smembers('routes'));
     },
     routeLoad({ commit }, trackname) {

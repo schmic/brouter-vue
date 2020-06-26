@@ -12,7 +12,10 @@
         </header>
         <div class="card-content">
             <div class="content">
-                <nav class="level">
+                <div v-if="!route.stats" class="notification">
+                    No statistics available for this route.
+                </div>
+                <nav v-if="route.stats" class="level">
                     <div class="level-item has-text-centered">
                         <i class="fa fa-route"></i>
                         {{ (route.stats.distance / 1000).toFixed(2) }} km

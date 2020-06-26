@@ -59,6 +59,8 @@ export const mutations = {
         state.segments.length ? statsCalc(state) : statsReset(state);
     },
     routeLoad(state, route) {
+        console.log('route', route);
+
         ['trackname', 'alternativeIdx', 'profile', 'waypoints', 'nogos', 'pois', 'stats'].forEach(
             it => (state[it] = route[it])
         );

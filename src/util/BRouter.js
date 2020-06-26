@@ -70,6 +70,66 @@ function buildUrl(lonlats, nogos, pois, options) {
     return url;
 }
 
+function splitUrl(url) {
+    let importState = url
+        .split('?')
+        .pop()
+        .split('&')
+        .map(it => it.split('='))
+        .reduce((result, it) => {
+            result[it[0]] = it[1];
+            return result;
+        }, {});
+
+    console.log('importState', importState);
+
+    delete importState.share;
+
+    importState.waypoints = [];
+    if (importState.lonlats) {
+        importState.waypoints = importState.lonlats.split('|').map(lonlat => {
+            let parts = lonlat.split(',');
+            return {
+                latlng: {
+                    lat: parseFloat(parts[1]),
+                    lng: parseFloat(parts[0])
+                }
+            };
+        });
+    }
+    delete importState.lonlats;
+
+    if (importState.nogos) {
+        importState.nogos = importState.nogos.split('|').map(nogo => {
+            let parts = nogo.split(',');
+            return {
+                latlng: {
+                    lat: parseFloat(parts[1]),
+                    lng: parseFloat(parts[0])
+                },
+                radius: parseInt(parts[2])
+            };
+        });
+    }
+
+    if (importState.pois) {
+        importState.pois = importState.pois.split('|').map(poi => {
+            let parts = poi.split(',');
+            return {
+                latlng: {
+                    lat: parseFloat(parts[1]),
+                    lng: parseFloat(parts[0])
+                },
+                name: parts[2]
+            };
+        });
+    }
+
+    importState.alternativeidx = parseInt(importState.alternativeidx || '0');
+
+    return importState;
+}
+
 function getRouteDownload(trackname, options) {
     trackname = trackname || `brouter-vue`;
 
@@ -86,6 +146,19 @@ function getRouteDownload(trackname, options) {
     };
 
     return buildUrl(waypoints, nogos, pois, { trackname: trackname, ...options });
+}
+
+function getRouteShare(state) {
+    return buildUrl(
+        state.waypoints.map(waypoint => waypoint.latlng),
+        state.nogos,
+        state.pois,
+        {
+            trackname: state.trackname,
+            alternativeIdx: state.alternativeIdx,
+            profile: state.profile
+        }
+    );
 }
 
 function getRouteSegment(from, to) {
@@ -115,4 +188,4 @@ const BRouter = {
 };
 
 export default BRouter;
-export { buildUrl, getRouteSegment, getRouteDownload }; // make testable
+export { buildUrl, splitUrl, getRouteSegment, getRouteDownload, getRouteShare };

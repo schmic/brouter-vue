@@ -49,7 +49,7 @@
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button class="button is-success" @click="importRouteTrigger">
+                    <button class="button is-success" @click="importRouteClick">
                         Import
                     </button>
                 </footer>
@@ -60,7 +60,7 @@
 
 <script>
 import RouteCard from '@/components/RouteCard';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     components: {
@@ -85,17 +85,21 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['routeSave']),
         importModalShow() {
-            this.modal.import.trackname = this.$route.query.trackname
-                ? this.$route.query.trackname
-                : `Import - ` + new Date().toISOString();
+            const share = JSON.parse(atob(this.$route.query.share));
+            this.modal.import.trackname = share.trackname || `Import - ` + new Date().toISOString();
             this.modal.import.show = true;
         },
         importModalHide() {
             this.modal.import.show = false;
         },
-        importRouteTrigger() {
-            console.log('IMPORT', this.$route.query);
+        importRouteClick() {
+            this.importModalHide();
+            const importRoute = JSON.parse(atob(this.$route.query.share));
+            importRoute.trackname = this.modal.import.trackname;
+            console.log('importRoute', importRoute);
+            this.routeSave(importRoute);
         }
     }
 };
