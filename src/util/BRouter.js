@@ -131,8 +131,6 @@ function splitUrl(url) {
 }
 
 function getRouteDownload(trackname, options) {
-    trackname = trackname || `brouter-vue`;
-
     let nogos = store.state.nogos;
     let pois = options.includePOIs ? store.state.pois : [];
     let waypoints = store.state.waypoints.map(waypoint => waypoint.latlng);

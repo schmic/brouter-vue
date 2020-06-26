@@ -21,9 +21,9 @@
                 <div class="control">
                     <button
                         class="button is-primary"
-                        title="Download route"
+                        title="Download current route state"
                         :disabled="trackname == undefined || trackname.length == 0"
-                        @click="exportModalShow"
+                        @click="showExportModal = true"
                     >
                         <span class="icon"> <i class="fas fa-file-download"></i></span>
                     </button>
@@ -31,9 +31,9 @@
                 <div class="control">
                     <button
                         class="button is-primary"
-                        title="Share current route as is"
+                        title="Share current route state"
                         :disabled="trackname == undefined || trackname.length == 0"
-                        @click="shareModalShow"
+                        @click="showShareModal = true"
                     >
                         <span class="icon"> <i class="fa fa-share"></i></span>
                     </button>
@@ -41,107 +41,32 @@
             </div>
             <route-alternative></route-alternative>
             <route-profile></route-profile>
-            <div id="modal-export" class="modal" :class="{ 'is-active': modal.export.show }">
-                <div class="modal-background"></div>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">Export Route</p>
-                        <button class="delete" aria-label="close" @click="exportModalHide"></button>
-                    </header>
-                    <section class="modal-card-body left-align">
-                        <div class="field">
-                            <label class="label">Name</label>
-                            <div class="control">
-                                <input
-                                    v-model="trackname"
-                                    class="input"
-                                    type="text"
-                                    placeholder="Enter route name ..."
-                                />
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="label">Format</label>
-                            <div class="control">
-                                <div class="select">
-                                    <select v-model="modal.export.format">
-                                        <option disabled value="">Please select export format</option>
-                                        <option value="gpx">GPX</option>
-                                        <option value="kml">KML</option>
-                                        <option value="geojson">GeoJSON</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="label" for="checkbox"> Include POIs</label>
-                            <div class="control">
-                                <input id="checkbox" v-model="modal.export.includePOIs" type="checkbox" />
-                            </div>
-                        </div>
-                    </section>
-                    <footer class="modal-card-foot">
-                        <button class="button is-success" @click="exportRouteTrigger">
-                            Export
-                        </button>
-                        <!-- <button class="button" @click="exportModalHide">Cancel</button> -->
-                    </footer>
-                </div>
-            </div>
-            <div id="modal-share" class="modal" :class="{ 'is-active': modal.share.show }">
-                <div class="modal-background"></div>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">Share Route</p>
-                        <button class="delete" aria-label="close" @click="shareModalHide"></button>
-                    </header>
-                    <section class="modal-card-body left-align">
-                        <div class="field">
-                            <label class="label">Name</label>
-                            <div class="control">
-                                <input v-model="modal.share.url" class="input" type="text" placeholder="Share URL" />
-                            </div>
-                        </div>
-                    </section>
-                    <footer class="modal-card-foot">
-                        <button class="button is-success" @click="shareRouteTrigger">
-                            Copy to clipboard
-                        </button>
-                    </footer>
-                </div>
-            </div>
-            <a id="dummyDownload" href=""></a>
-            <input id="dummyClipboard" name="dummy" type="hidden" />
+
+            <route-share-modal :show="showShareModal" @hide="showShareModal = false"></route-share-modal>
+            <route-download-modal :show="showExportModal" @hide="showExportModal = false"></route-download-modal>
         </div>
     </article>
 </template>
 
 <script>
-import { getRouteDownload } from '@/util/BRouter';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 
 import RouteAlternative from '@/components/RouteAlternative';
 import RouteProfile from '@/components/RouteProfile';
+import RouteShareModal from '@/components/RouteShare';
+import RouteDownloadModal from '@/components/RouteDownload';
 
 export default {
     components: {
         RouteAlternative,
-        RouteProfile
+        RouteProfile,
+        RouteShareModal,
+        RouteDownloadModal
     },
     data() {
         return {
-            modal: {
-                export: {
-                    show: false,
-                    format: 'gpx',
-                    includePOIs: false
-                },
-                share: {
-                    show: false,
-                    includePOIs: true,
-                    url: ''
-                }
-            }
+            showExportModal: false,
+            showShareModal: false
         };
     },
     computed: {
@@ -154,43 +79,11 @@ export default {
             }
         }
     },
+    mounted() {},
     methods: {
         ...mapActions(['routeSave']),
-        ...mapGetters(['routeShareCurrent']),
         routeSaveClick() {
             this.routeSave(this.trackname);
-        },
-        shareModalShow() {
-            this.modal.share.show = true;
-            let shareUrl = this.routeShareCurrent();
-            this.modal.share.url = `${location.href.replace('map', 'route')}?share=${shareUrl}`;
-        },
-        shareModalHide() {
-            this.modal.share.show = false;
-        },
-        shareRouteTrigger() {
-            var copyText = document.getElementById('dummyClipboard');
-            copyText.type = 'text';
-            copyText.value = this.modal.share.url;
-            copyText.select();
-            document.execCommand('copy');
-            copyText.type = 'hidden';
-            copyText.value = '';
-
-            this.shareModalHide();
-        },
-        exportModalShow() {
-            this.modal.export.show = true;
-        },
-        exportModalHide() {
-            this.modal.export.show = false;
-        },
-        exportRouteTrigger() {
-            const a = document.getElementById('dummyDownload');
-            a.href = getRouteDownload(this.trackname, this.modal.export);
-            a.click();
-            a.href = '#';
-            this.exportModalHide();
         }
     }
 };

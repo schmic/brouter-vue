@@ -24,7 +24,6 @@
         </article>
 
         <route-card v-for="(routeName, index) in routeNames" :key="index" :route-name="routeName"></route-card>
-
         <div id="modal-import" class="modal" :class="{ 'is-active': modal.import.show }">
             <div class="modal-background"></div>
             <div class="modal-card">
