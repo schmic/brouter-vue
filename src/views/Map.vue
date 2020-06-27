@@ -214,6 +214,8 @@ import RouteMeta from '@/components/RouteMeta.vue';
 import TrackMeta from '@/components/TrackMeta.vue';
 import PoiList from '@/components/PoiList.vue';
 
+import { createPOI } from '../model/POI';
+
 export default {
     name: 'Map',
     components: {
@@ -257,6 +259,7 @@ export default {
             },
             set(mode) {
                 this.trackDrawerToolBar.setMode(mode == this.toolBarMode ? null : mode);
+                this.$store.commit('toolBarMode', this.trackDrawerToolBar.options.mode);
             }
         }
     },
@@ -289,10 +292,7 @@ export default {
                 this.nogoUpdate(nogo);
             });
 
-            this.$store.state.pois.forEach(poi => {
-                poi = this._createPOI(poi.latlng, {}, this.$refs.map.mapObject);
-                this.poiUpdate(poi);
-            });
+            this.$store.state.pois.forEach(poi => poi.l.addTo(this.$refs.map.mapObject));
 
             this.trackDrawer.on('TrackDrawer:done', () => {
                 this.waypointsUpdate(this.trackDrawer.getNodes());
@@ -323,9 +323,10 @@ export default {
                 this.nogoUpdate(nogo);
                 this.refreshEdges();
             } else if (this.toolBarMode === 'poi') {
-                this.toolBarMode = undefined;
-                let poi = this._createPOI(evt.latlng, {}, map);
+                let poi = createPOI({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                poi.l.addTo(map);
                 this.poiUpdate(poi);
+                this.toolBarMode = undefined;
             }
         },
         setTileprovider(provider) {
@@ -340,28 +341,6 @@ export default {
         },
         refreshEdges() {
             this.trackDrawer.refreshEdges();
-        },
-        _createPOI(latlng, options, map) {
-            options = {
-                ...{
-                    draggable: true,
-                    icon: window.L.AwesomeMarkers.icon({
-                        icon: 'map-marker-alt',
-                        prefix: 'fa',
-                        markerColor: 'purple'
-                    })
-                },
-                ...options
-            };
-            let poi = window.L.marker(latlng, options);
-            return poi.addTo(map).on('click', evt => {
-                let poi = evt.target;
-                window.L.DomEvent.stop(evt);
-                if (this.toolBarMode == 'delete') {
-                    poi.remove();
-                    this.poiRemove(poi);
-                }
-            });
         },
         _createNoGo(latlng, options, map) {
             let nogo = window.L.circle(latlng, options);

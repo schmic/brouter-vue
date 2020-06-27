@@ -6,28 +6,27 @@ import Waypoint from '@/model/Waypoint';
 import { statsCalc, statsReset } from '@/store/helpers/stats';
 
 export const mutations = {
+    toolBarMode(state, mode) {
+        state.toolBarMode = mode;
+    },
+    tracknameUpdate(state, trackname) {
+        state.trackname = trackname;
+    },
     alternativeIdxUpdate(state, alternativeIdx) {
         state.alternativeIdx = alternativeIdx;
     },
     profileUpdate(state, profile) {
         state.profile = profile;
     },
-    routesUpdate(state, routes) {
-        state.routes = routes;
-    },
-    tracknameUpdate(state, trackname) {
-        state.trackname = trackname;
-    },
     poiUpdate(state, poi) {
-        poi = new POI(poi);
         state.pois = state.pois.filter(_poi => !poi.equalsTo(_poi)).concat([poi]);
     },
     poiRemove(state, poi) {
-        poi = new POI(poi);
+        poi.l.remove();
         state.pois = state.pois.filter(_poi => !poi.equalsTo(_poi));
     },
     poisUpdate(state, pois) {
-        state.pois = pois.map(poi => new POI(poi));
+        state.pois = pois;
     },
     nogoUpdate(state, nogo) {
         nogo = new NoGo(nogo);
@@ -57,6 +56,9 @@ export const mutations = {
                 new Segment(edge._leaflet_id, edge._startMarkerId, edge._endMarkerId, edge.getLatLngs(), edge.options)
         );
         state.segments.length ? statsCalc(state) : statsReset(state);
+    },
+    routesUpdate(state, routes) {
+        state.routes = routes;
     },
     routeLoad(state, route) {
         console.log('route', route);

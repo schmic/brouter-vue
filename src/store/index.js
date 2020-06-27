@@ -8,6 +8,8 @@ import { mutations } from './mutations';
 import { actions } from './actions';
 import { getters } from './getters';
 
+import { createPOI } from '../model/POI';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -18,7 +20,7 @@ export default new Vuex.Store({
         profile: Lockr.get(`state/profile`, 'fastbike'),
         waypoints: Lockr.get('state/waypoints', []),
         nogos: Lockr.get('state/nogos', []),
-        pois: Lockr.get('state/pois', []),
+        pois: Lockr.get('state/pois', []).map(poi => createPOI(poi)),
         stats: {
             distance: 0,
             totaltime: 0,
@@ -26,6 +28,7 @@ export default new Vuex.Store({
             ascend: 0,
             descend: 0
         },
+        toolBarMode: undefined,
         routes: Lockr.get('routes', [])
     },
     mutations,

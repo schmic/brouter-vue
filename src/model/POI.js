@@ -1,16 +1,76 @@
+import store from '../store';
+import { uuid } from 'uuidv4';
+
 export default class POI {
-    constructor(leafletObject) {
-        let latlng = { lat: leafletObject.getLatLng().lat, lng: leafletObject.getLatLng().lng };
-        this.id = leafletObject._leaflet_id;
-        this.name = 'TODO:  Name';
-        this.latlng = latlng;
+    constructor(l, id, name) {
+        this.id = id || uuid();
+        this.name = name || `POI ${this.id.substring(1, 16)}`;
+        this.l = l;
     }
 
-    equalsTo(nogo) {
-        return this.id == nogo.id || (this.latlng.lat == nogo.latlng.lat && this.latlng.lng == nogo.latlng.lng);
+    get latlng() {
+        return this.l.getLatLng();
+    }
+
+    get options() {
+        return {
+            draggable: this.l.options.draggable
+        };
+    }
+
+    get icon() {
+        return this.l.options.icon.options;
+    }
+
+    equalsTo(poi) {
+        return this.id == poi.id || (this.latlng.lat == poi.latlng.lat && this.latlng.lng == poi.latlng.lng);
+    }
+
+    serialize() {
+        return {
+            id: this.id,
+            name: this.name,
+            latlng: this.latlng,
+            options: this.options,
+            icon: this.icon
+        };
     }
 
     toString() {
         return `id:${this.id}, name:${this.name}, latlng:${this.latlng}`;
     }
 }
+
+export const createPOI = _poi => {
+    console.log('createPOI', _poi);
+
+    let options = {
+        ...{
+            // defaults
+            draggable: true,
+            icon: window.L.AwesomeMarkers.icon({
+                ...{
+                    // defaults
+                    icon: 'map-marker-alt',
+                    prefix: 'fa',
+                    markerColor: 'purple'
+                },
+                ..._poi.icon
+            })
+        },
+        ..._poi.options
+    };
+
+    let poi = new POI(window.L.marker(_poi.latlng, options), name);
+    poi.l.on('click', evt => {
+        window.L.DomEvent.stop(evt);
+        if (store.state.toolBarMode == 'delete') {
+            store.commit('poiRemove', poi);
+        }
+    });
+    poi.l.on('moveend', () => {
+        store.commit('poiUpdate', poi);
+    });
+
+    return poi;
+};
