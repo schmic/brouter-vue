@@ -1,0 +1,333 @@
+{
+    "url": "https://www.komoot.de/api/v007/tours/105499791.geojson",
+    "status": "public",
+    "type": "tour_planned",
+    "date": "2019-12-08T17:17:47.214Z",
+    "name": "Von Bensheim nach Neubrandenburg",
+    "source": "{\"api\":\"de.komoot.routing-api\",\"type\":\"tour_planned\",\"id\":105499791,\"version\":[1270,20191127,\"4.0.6\"]}",
+    "distance": 832286.2826716807,
+    "duration": 136706,
+    "sport": "racebike",
+    "query": "d09AvZeowCDkM0=F1rUCGn0pA9Pgc_HIbRdBWspLuRpBNrQo8MEGsbVI1ZNwzGuVIygiREJmGUyzBrMX-nuAWVC6WWYDrKAYnx17IQA9XAEsImILIBzDAMg5AEpQB5xIA2XAbipIsCAr-yQW64BbcLVbvaciaLk4y0QIQ1WxAvcDHgzQsmOCogkLgAIkyNBKZSDLjwZMSbNlhBOJIC4yQU9nBhSwq2JIah1BcLLBlmAEdaYkJzJJUIXy6Yym5A4zAFcUah3cMEqhvkMYKGmCq7wQnrYSNTA7oLuGxQTLZBcSIW0sYaolB3RoYYnQHiwBQFYkhZII5HAJj6A5Y3_7jHh6iBoj_-hAEwx6A2-YAieJhaqATK_4OZDbiqAEuoMZTE0sqAZIYCGUKVpT_6T4CCBIhLa_Vd4iX_PTNr988RO_zMmEB_9lIETHfmRsChRonkUf-J_CIlx7SVf5cYA9SDoBiIWS8KW58AAu4BGjrMhi6YiS2aQeDtw",
+    "constitution": 3,
+    "summary": {
+        "surfaces": [
+            { "type": "sb#unpaved", "amount": 0.01953845 },
+            { "type": "sb#compacted", "amount": 0.0020576837 },
+            { "type": "sb#cobbles", "amount": 0.011839525 },
+            { "type": "sb#paved", "amount": 0.13868134 },
+            { "type": "sb#asphalt", "amount": 0.82500106 },
+            { "type": "sf#unknown", "amount": 0.0028819644 }
+        ],
+        "way_types": [
+            { "type": "wt#trail", "amount": 0.0011673073 },
+            { "type": "wt#way", "amount": 0.07064699 },
+            { "type": "wt#service", "amount": 7.905286e-5 },
+            { "type": "wt#cycleway", "amount": 0.25482288 },
+            { "type": "wt#minor_road", "amount": 0.09600721 },
+            { "type": "wt#street", "amount": 0.40419528 },
+            { "type": "wt#primary", "amount": 0.17308126 }
+        ]
+    },
+    "difficulty": { "grade": "difficult", "explanation_technical": "dr#t3", "explanation_fitness": "d#c3" },
+    "segments": [
+        { "type": "Routed", "from": 0, "to": 404 },
+        { "type": "Routed", "from": 404, "to": 803 },
+        { "type": "Routed", "from": 803, "to": 1825 },
+        { "type": "Routed", "from": 1825, "to": 2337 },
+        { "type": "Routed", "from": 2337, "to": 2854 },
+        { "type": "Routed", "from": 3416, "to": 4084 },
+        { "type": "Routed", "from": 4084, "to": 4121 },
+        { "type": "Routed", "from": 4121, "to": 4131 },
+        { "type": "Routed", "from": 4160, "to": 4171 },
+        { "type": "Routed", "from": 4171, "to": 4194 },
+        { "type": "Routed", "from": 4194, "to": 4202 },
+        { "type": "Routed", "from": 4202, "to": 4219 },
+        { "type": "Routed", "from": 4219, "to": 4783 },
+        { "type": "Routed", "from": 4783, "to": 5062 },
+        { "type": "Routed", "from": 5062, "to": 6330 },
+        { "type": "Routed", "from": 6535, "to": 6711 },
+        { "type": "Routed", "from": 6711, "to": 6985 },
+        { "type": "Routed", "from": 6985, "to": 7223 },
+        { "type": "Routed", "from": 7223, "to": 7526 },
+        { "type": "Routed", "from": 7526, "to": 7573 },
+        { "type": "Routed", "from": 7573, "to": 7796 },
+        { "type": "Routed", "from": 7796, "to": 7963 },
+        { "type": "Routed", "from": 7963, "to": 7995 },
+        { "type": "Routed", "from": 8004, "to": 8447 },
+        { "type": "Routed", "from": 8484, "to": 8592 },
+        { "type": "Routed", "from": 8592, "to": 9603 },
+        { "type": "Routed", "from": 9624, "to": 9736 },
+        { "type": "Routed", "from": 9872, "to": 9995 },
+        { "type": "Routed", "from": 10009, "to": 10268 },
+        { "type": "Routed", "from": 10268, "to": 10465 },
+        { "type": "Routed", "from": 10568, "to": 10656 },
+        { "type": "Routed", "from": 10656, "to": 10779 },
+        { "type": "Routed", "from": 10779, "to": 10854 },
+        { "type": "Routed", "from": 10854, "to": 11007 },
+        { "type": "Routed", "from": 11007, "to": 11068 },
+        { "type": "Routed", "from": 11068, "to": 11230 },
+        { "type": "Routed", "from": 11230, "to": 11532 },
+        { "type": "Routed", "from": 11532, "to": 11581 },
+        { "type": "Routed", "from": 11581, "to": 11587 },
+        { "type": "Routed", "from": 11635, "to": 12044 },
+        { "type": "Routed", "from": 12044, "to": 12525 },
+        { "type": "Routed", "from": 12558, "to": 12591 },
+        { "type": "Routed", "from": 12591, "to": 12802 },
+        { "type": "Routed", "from": 12850, "to": 12969 },
+        { "type": "Routed", "from": 12994, "to": 13038 },
+        { "type": "Routed", "from": 13088, "to": 13852 },
+        { "type": "Routed", "from": 13852, "to": 13888 },
+        { "type": "Routed", "from": 13888, "to": 14992 }
+    ],
+    "path": [
+        { "location": { "lat": 49.700455, "lng": 8.622349, "alt": 112 }, "index": 0, "reference": "hlp:216997" },
+        { "location": { "lat": 49.819242, "lng": 8.653641, "alt": 125.6 }, "index": 404 },
+        { "location": { "lat": 49.863631, "lng": 8.76535, "alt": 176.1 }, "index": 803 },
+        { "location": { "lat": 50.130746, "lng": 9.149491, "alt": 184.2 }, "index": 1825 },
+        { "location": { "lat": 50.265205, "lng": 9.317081, "alt": 190 }, "index": 2337, "reference": "hlp:873013" },
+        {
+            "location": { "lat": 50.487799, "lng": 9.639846, "alt": 380.6 },
+            "index": 2854,
+            "end_index": 3416,
+            "reference": "hls:206882",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 50.692846, "lng": 9.914844, "alt": 338 }, "index": 4084, "reference": "hlp:793292" },
+        { "location": { "lat": 50.704169, "lng": 9.90947, "alt": 9.9 }, "index": 4121, "reference": "hlp:763286" },
+        {
+            "location": { "lat": 50.71566, "lng": 9.922298, "alt": 417 },
+            "index": 4131,
+            "end_index": 4160,
+            "reference": "hls:483016",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 50.719269, "lng": 9.928164, "alt": 412 }, "index": 4171, "reference": "hlp:156171" },
+        { "location": { "lat": 50.725674, "lng": 9.93553, "alt": 380.7 }, "index": 4194 },
+        { "location": { "lat": 50.733467, "lng": 9.937908, "alt": 359.7 }, "index": 4202 },
+        { "location": { "lat": 50.747568, "lng": 9.941387, "alt": 316.3 }, "index": 4219 },
+        { "location": { "lat": 50.927714, "lng": 10.226075, "alt": 324.7 }, "index": 4783 },
+        { "location": { "lat": 50.974612, "lng": 10.320064, "alt": 227.8 }, "index": 5062, "reference": "hlp:874223" },
+        {
+            "location": { "lat": 51.35415, "lng": 10.964915, "alt": 226 },
+            "index": 6330,
+            "end_index": 6535,
+            "reference": "hls:738312",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 51.378204, "lng": 11.179651, "alt": 191.6 }, "index": 6711, "reference": "hlp:817203" },
+        { "location": { "lat": 51.464252, "lng": 11.362859, "alt": 232.6 }, "index": 6985, "reference": "hlp:1095680" },
+        { "location": { "lat": 51.502519, "lng": 11.513017, "alt": 247.2 }, "index": 7223 },
+        { "location": { "lat": 51.605713, "lng": 11.617246, "alt": 150.3 }, "index": 7526, "reference": "hlp:891692" },
+        { "location": { "lat": 51.617531, "lng": 11.657248, "alt": 100.5 }, "index": 7573 },
+        { "location": { "lat": 51.667341, "lng": 11.743106, "alt": 68 }, "index": 7796, "reference": "hlp:175497" },
+        { "location": { "lat": 51.714538, "lng": 11.851772, "alt": 77.4 }, "index": 7963 },
+        {
+            "location": { "lat": 51.732797, "lng": 11.903402, "alt": 89 },
+            "index": 7995,
+            "end_index": 8004,
+            "reference": "hls:804942",
+            "segment_type": "Routed"
+        },
+        {
+            "location": { "lat": 51.830691, "lng": 12.202064, "alt": 54.9 },
+            "index": 8447,
+            "end_index": 8484,
+            "reference": "hls:812343",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 51.852562, "lng": 12.232549, "alt": 68.3 }, "index": 8592 },
+        {
+            "location": { "lat": 52.248283, "lng": 12.895747, "alt": 52.5 },
+            "index": 9603,
+            "end_index": 9624,
+            "reference": "hls:456972",
+            "segment_type": "Routed"
+        },
+        {
+            "location": { "lat": 52.335059, "lng": 12.935719, "alt": 40 },
+            "index": 9736,
+            "end_index": 9872,
+            "reference": "hls:68075",
+            "segment_type": "Routed"
+        },
+        {
+            "location": { "lat": 52.366466, "lng": 13.011567, "alt": 35.5 },
+            "index": 9995,
+            "end_index": 10009,
+            "reference": "hls:975281",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 52.413509, "lng": 13.090067, "alt": 76 }, "index": 10268, "reference": "hlp:93484" },
+        {
+            "location": { "lat": 52.475139, "lng": 13.199049, "alt": 71 },
+            "index": 10465,
+            "end_index": 10568,
+            "reference": "hls:99879",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 52.51554, "lng": 13.230062, "alt": 54.1 }, "index": 10656, "reference": "hlp:149593" },
+        { "location": { "lat": 52.520429, "lng": 13.266479, "alt": 60.1 }, "index": 10779 },
+        { "location": { "lat": 52.520127, "lng": 13.295864, "alt": 36.1 }, "index": 10854, "reference": "hlp:246740" },
+        { "location": { "lat": 52.51402, "lng": 13.349349, "alt": 33.5 }, "index": 11007, "reference": "hlp:156047" },
+        { "location": { "lat": 52.516196, "lng": 13.377556, "alt": 35.9 }, "index": 11068, "reference": "hlp:312021" },
+        { "location": { "lat": 52.484432, "lng": 13.38734, "alt": 87 }, "index": 11230, "reference": "hlp:112405" },
+        { "location": { "lat": 52.535151, "lng": 13.389872, "alt": 39 }, "index": 11532, "reference": "hlp:158053" },
+        { "location": { "lat": 52.54379, "lng": 13.402644, "alt": 52.2 }, "index": 11581, "reference": "hlp:338762" },
+        {
+            "location": { "lat": 52.551895, "lng": 13.39978, "alt": 80.8 },
+            "index": 11587,
+            "end_index": 11635,
+            "reference": "hls:279131",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 52.692894, "lng": 13.377573, "alt": 54 }, "index": 12044, "reference": "hlp:501357" },
+        {
+            "location": { "lat": 53.017862, "lng": 13.308744, "alt": 50.6 },
+            "index": 12525,
+            "end_index": 12558,
+            "reference": "hls:412704",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 53.034088, "lng": 13.309615, "alt": 46.2 }, "index": 12591 },
+        {
+            "location": { "lat": 53.112568, "lng": 13.200356, "alt": 100 },
+            "index": 12802,
+            "end_index": 12850,
+            "reference": "hls:162068",
+            "segment_type": "Routed"
+        },
+        {
+            "location": { "lat": 53.186421, "lng": 13.197191, "alt": 58.9 },
+            "index": 12969,
+            "end_index": 12994,
+            "reference": "hls:504981",
+            "segment_type": "Routed"
+        },
+        {
+            "location": { "lat": 53.216618, "lng": 13.172647, "alt": 124.6 },
+            "index": 13038,
+            "end_index": 13088,
+            "reference": "hls:950370",
+            "segment_type": "Routed"
+        },
+        { "location": { "lat": 53.557378, "lng": 13.261166, "alt": 21.3 }, "index": 13852 },
+        { "location": { "lat": 53.561893, "lng": 13.261541, "alt": 17.3 }, "index": 13888, "reference": "poi:5WdC" },
+        { "location": { "lat": 54.30908, "lng": 13.077472, "alt": 2.1 }, "index": 14992, "reference": "hlp:984942" }
+    ],
+    "_links": {
+        "creator": { "href": "http://api.komoot.de/v007/users/401765367147/profile_embedded" },
+        "self": { "href": "http://api.komoot.de/v007/tours/105499791" },
+        "coordinates": { "href": "http://api.komoot.de/v007/tours/105499791/coordinates" },
+        "participants": { "href": "http://api.komoot.de/v007/tours/105499791/participants/" },
+        "way_types": { "href": "http://api.komoot.de/v007/tours/105499791/way_types" },
+        "surfaces": { "href": "http://api.komoot.de/v007/tours/105499791/surfaces" },
+        "directions": { "href": "http://api.komoot.de/v007/tours/105499791/directions" },
+        "timeline": { "href": "http://api.komoot.de/v007/tours/105499791/timeline/" }
+    },
+    "kcal_active": 0,
+    "kcal_resting": 0,
+    "start_point": { "lat": 49.700515, "lng": 8.622285, "alt": 116.5 },
+    "elevation_up": 5281.047230067097,
+    "elevation_down": 5389.410808254414,
+    "tour_information": [
+        { "type": "MOVABLE_BRIDGE", "segments": [{ "from": 12280, "to": 12281 }] },
+        {
+            "type": "UNSUITABLE",
+            "segments": [
+                { "from": 1054, "to": 1055 },
+                { "from": 2782, "to": 2785 },
+                { "from": 2889, "to": 2927 },
+                { "from": 3058, "to": 3119 },
+                { "from": 3264, "to": 3318 },
+                { "from": 3334, "to": 3346 },
+                { "from": 3380, "to": 3384 },
+                { "from": 4114, "to": 4117 },
+                { "from": 4136, "to": 4140 },
+                { "from": 4155, "to": 4165 },
+                { "from": 4177, "to": 4221 },
+                { "from": 6166, "to": 6177 },
+                { "from": 6593, "to": 6601 },
+                { "from": 7255, "to": 7273 },
+                { "from": 7524, "to": 7528 },
+                { "from": 7567, "to": 7581 },
+                { "from": 7608, "to": 7616 },
+                { "from": 8555, "to": 8557 },
+                { "from": 8570, "to": 8609 },
+                { "from": 9394, "to": 9397 },
+                { "from": 9574, "to": 9579 },
+                { "from": 10630, "to": 10635 },
+                { "from": 10677, "to": 10682 },
+                { "from": 10710, "to": 10713 },
+                { "from": 10851, "to": 10858 },
+                { "from": 11567, "to": 11570 },
+                { "from": 11580, "to": 11590 },
+                { "from": 11647, "to": 11650 },
+                { "from": 11653, "to": 11656 },
+                { "from": 12024, "to": 12028 },
+                { "from": 12033, "to": 12055 },
+                { "from": 12060, "to": 12064 },
+                { "from": 12579, "to": 12597 },
+                { "from": 12852, "to": 12889 },
+                { "from": 12946, "to": 12954 },
+                { "from": 13008, "to": 13014 },
+                { "from": 13338, "to": 13340 },
+                { "from": 13823, "to": 13867 },
+                { "from": 13898, "to": 13904 },
+                { "from": 14282, "to": 14294 },
+                { "from": 14511, "to": 14518 }
+            ]
+        },
+        {
+            "type": "STEPS",
+            "segments": [
+                { "from": 3401, "to": 3405 },
+                { "from": 10654, "to": 10658 }
+            ]
+        },
+        {
+            "type": "BICYCLE_DISMOUNT",
+            "segments": [
+                { "from": 3405, "to": 3408 },
+                { "from": 3413, "to": 3418 },
+                { "from": 10635, "to": 10677 },
+                { "from": 10849, "to": 10855 },
+                { "from": 11002, "to": 11012 },
+                { "from": 13881, "to": 13889 }
+            ]
+        }
+    ],
+    "_embedded": {
+        "creator": {
+            "username": "401765367147",
+            "avatar": {
+                "src": "https://d2exd72xrrp1s7.cloudfront.net/www/9z/9zciedsgfndg1urtr5idk0ml324gni9xx14360184-full/0?width={width}&height={height}&crop={crop}",
+                "templated": true,
+                "type": "image/*"
+            },
+            "status": "public",
+            "_links": {
+                "self": { "href": "http://api.komoot.de/v007/users/401765367147/profile_embedded" },
+                "relation": {
+                    "href": "http://api.komoot.de/v007/users/{username}/relations/401765367147",
+                    "templated": true
+                }
+            },
+            "display_name": "schmic"
+        }
+    },
+    "id": "105499791",
+    "changed_at": "2020-06-26T22:29:45.367Z",
+    "map_image": {
+        "src": "https://photos.komoot.de/www/maps/105499791-ef631f5bddcc43012f26d80b4b308a3df6f65ac8e61c58b903e02715dd5519f0-big@2x.jpg/172f2c04117?width={width}&height={height}&crop={crop}",
+        "templated": true,
+        "type": "image/*",
+        "attribution": "Map data © OpenStreetMap contributors"
+    },
+    "map_image_preview": {
+        "src": "https://photos.komoot.de/www/maps/105499791-ef631f5bddcc43012f26d80b4b308a3df6f65ac8e61c58b903e02715dd5519f0-small@2x.jpg/172f2c04117?width={width}&height={height}&crop={crop}",
+        "templated": true,
+        "type": "image/*",
+        "attribution": "Map data © OpenStreetMap contributors"
+    }
+}
