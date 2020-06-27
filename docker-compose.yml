@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+    brouter-segments:
+
 services:
     ## usage: docker-compose run --rm -p 8080:8080 serve
     ##      : docker-compose up (-d) serve
@@ -10,14 +13,24 @@ services:
             - 8080:8080
         user: '1000'
         volumes:
-            - ./:/src
+            - ./:/src:cached
         working_dir: /src
 
     ## usage: docker-compose run --rm install
-    install:
-        command: yarn install
-        image: node:lts
-        user: '1000'
+    # install:
+    #     command: yarn install
+    #     image: node:lts
+    #     user: '1000'
+    #     volumes:
+    #         - ./:/src
+    #     working_dir: /src
+
+    ## brouter server, you need to download some segments
+    ## usage: docker-compose up -d brouter
+    ## segments from: https://brouter.de/brouter/segments4/E5_N45.rd5
+    brouter:
+        image: schmic/brouter-server:latest
+        ports:
+            - 17777:17777
         volumes:
-            - ./:/src
-        working_dir: /src
+            - brouter-segments:/opt/brouter/segments
