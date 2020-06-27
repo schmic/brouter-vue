@@ -13,7 +13,7 @@ const LockrPlugin = store => {
         stateKeys.forEach(it => Lockr.set(`state/${it}`, state[it]));
     });
     store.subscribe((mutation, state) => {
-        ['trackname', 'alternativeIdx', 'profile', 'waypoint', 'nogo']
+        ['trackname', 'alternativeIdx', 'profile', 'waypoint']
             .filter(type => mutation.type.startsWith(type))
             .forEach(it => Lockr.set(`state/${it}`, state[it]));
 
@@ -22,6 +22,13 @@ const LockrPlugin = store => {
             Lockr.set(
                 `state/${stateKey}`,
                 state[stateKey].map(poi => poi.serialize())
+            );
+        }
+        if (['nogoUpdate', 'nogoRemove', 'nogosUpdate'].includes(mutation.type)) {
+            const stateKey = 'nogos';
+            Lockr.set(
+                `state/${stateKey}`,
+                state[stateKey].map(nogo => nogo.serialize())
             );
         }
     });

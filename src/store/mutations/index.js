@@ -1,5 +1,3 @@
-import POI from '@/model/POI';
-import NoGo from '@/model/NoGo';
 import Segment from '@/model/Segment';
 import Waypoint from '@/model/Waypoint';
 
@@ -29,15 +27,14 @@ export const mutations = {
         state.pois = pois;
     },
     nogoUpdate(state, nogo) {
-        nogo = new NoGo(nogo);
         state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo)).concat([nogo]);
     },
     nogoRemove(state, nogo) {
-        nogo = new NoGo(nogo);
+        nogo.l.remove();
         state.nogos = state.nogos.filter(_nogo => !nogo.equalsTo(_nogo));
     },
     nogosUpdate(state, nogos) {
-        state.nogos = nogos.map(nogo => new NoGo(nogo));
+        state.nogos = nogos;
     },
     waypointsUpdate(state, trackDrawerNodes) {
         // from trackdrawer event

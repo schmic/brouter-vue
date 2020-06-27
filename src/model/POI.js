@@ -3,9 +3,10 @@ import { uuid } from 'uuidv4';
 
 export default class POI {
     constructor(l, id, name) {
+        this.l = l;
+
         this.id = id || uuid();
         this.name = name || `POI ${this.id.substring(1, 16)}`;
-        this.l = l;
     }
 
     get latlng() {

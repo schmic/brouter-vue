@@ -215,6 +215,7 @@ import TrackMeta from '@/components/TrackMeta.vue';
 import PoiList from '@/components/PoiList.vue';
 
 import { createPOI } from '../model/POI';
+import { createNoGo } from '../model/NoGo';
 
 export default {
     name: 'Map',
@@ -264,8 +265,6 @@ export default {
         }
     },
     created() {
-        if (this.$route.query.share) this.$router.push({ path: 'route', query: this.$route.query });
-
         let defaultZoom = JSON.stringify(this.zoom);
         this.zoom = parseInt(localStorage.getItem('map/zoom') || defaultZoom);
 
@@ -280,19 +279,15 @@ export default {
             this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
 
             // import
+            this.$store.state.nogos.forEach(nogo => nogo.l.addTo(this.$refs.map.mapObject));
+            this.$store.state.pois.forEach(poi => poi.l.addTo(this.$refs.map.mapObject));
+
             this.$store.state.waypoints.forEach(waypoint => {
                 waypoint.options = waypoint.options || { type: 'waypoint' };
                 let marker = window.L.TrackDrawer.node(waypoint.latlng).setType(waypoint.options.type);
                 this.trackDrawerToolBar._bindMarkerEvents(marker);
                 this.trackDrawer.addNode(marker);
             });
-
-            this.$store.state.nogos.forEach(nogo => {
-                nogo = this._createNoGo(nogo.latlng, { radius: nogo.radius }, this.$refs.map.mapObject);
-                this.nogoUpdate(nogo);
-            });
-
-            this.$store.state.pois.forEach(poi => poi.l.addTo(this.$refs.map.mapObject));
 
             this.trackDrawer.on('TrackDrawer:done', () => {
                 this.waypointsUpdate(this.trackDrawer.getNodes());
@@ -315,16 +310,15 @@ export default {
             localStorage.setItem('map/center', JSON.stringify(center));
         },
         onMapClicked(evt) {
-            let map = this.$refs.map.mapObject;
-
             if (this.toolBarMode === 'nogo') {
-                this.toolBarMode = undefined;
-                let nogo = this._createNoGo(evt.latlng, { radius: 2500 }, map);
+                let nogo = createNoGo({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                nogo.l.addTo(this.$refs.map.mapObject);
                 this.nogoUpdate(nogo);
                 this.refreshEdges();
+                this.toolBarMode = undefined;
             } else if (this.toolBarMode === 'poi') {
                 let poi = createPOI({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
-                poi.l.addTo(map);
+                poi.l.addTo(this.$refs.map.mapObject);
                 this.poiUpdate(poi);
                 this.toolBarMode = undefined;
             }
@@ -341,30 +335,6 @@ export default {
         },
         refreshEdges() {
             this.trackDrawer.refreshEdges();
-        },
-        _createNoGo(latlng, options, map) {
-            let nogo = window.L.circle(latlng, options);
-            return nogo
-                .addTo(map)
-                .on('dblclick', evt => {
-                    window.L.DomEvent.stop(evt);
-                })
-                .on('click', evt => {
-                    window.L.DomEvent.stop(evt);
-                    if (this.toolBarMode == 'delete') {
-                        evt.target.remove();
-                        this.nogoRemove(evt.target);
-                    } else {
-                        evt.target.toggleEdit();
-                        if (evt.target.editEnabled()) {
-                            evt.target.setStyle({ color: 'darkred' });
-                        } else {
-                            evt.target.setStyle({ color: '#3388ff' });
-                            this.nogoUpdate(evt.target);
-                            this.refreshEdges();
-                        }
-                    }
-                });
         }
     }
 };

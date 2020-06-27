@@ -9,6 +9,7 @@ import { actions } from './actions';
 import { getters } from './getters';
 
 import { createPOI } from '../model/POI';
+import { createNoGo } from '../model/NoGo';
 
 Vue.use(Vuex);
 
@@ -19,7 +20,7 @@ export default new Vuex.Store({
         alternativeIdx: Lockr.get('state/alternativeIdx', 0),
         profile: Lockr.get(`state/profile`, 'fastbike'),
         waypoints: Lockr.get('state/waypoints', []),
-        nogos: Lockr.get('state/nogos', []),
+        nogos: Lockr.get('state/nogos', []).map(nogo => createNoGo(nogo)),
         pois: Lockr.get('state/pois', []).map(poi => createPOI(poi)),
         stats: {
             distance: 0,
