@@ -14,8 +14,7 @@
             <table v-if="pois.length" class="table is-fullwidth">
                 <tr>
                     <th>Name</th>
-                    <th>Lat</th>
-                    <th>Lng</th>
+                    <th>Lat / Lng</th>
                     <th></th>
                 </tr>
                 <tr v-for="(poi, index) in pois" :key="poi.id">
@@ -23,10 +22,9 @@
                         <span> {{ poi.name ? poi.name.substring(0, 16) : index + 1 }} </span>
                     </td>
                     <td>
-                        <span> {{ poi.latlng.lat.toFixed(5) }} </span>
-                    </td>
-                    <td>
-                        <span> {{ poi.latlng.lng.toFixed(5) }} </span>
+                        <span> {{ poi.latlng.lat.toFixed(6) }} </span>
+                        /
+                        <span> {{ poi.latlng.lng.toFixed(6) }} </span>
                     </td>
                 </tr>
             </table>
