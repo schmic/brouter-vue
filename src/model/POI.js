@@ -52,7 +52,7 @@ export const createPOI = _poi => {
             icon: window.L.AwesomeMarkers.icon({
                 ...{
                     // defaults
-                    icon: 'map-marker-alt',
+                    icon: 'map-marked-alt',
                     prefix: 'fa',
                     markerColor: 'purple'
                 },

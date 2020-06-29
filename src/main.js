@@ -4,16 +4,15 @@ import '../css/main.css';
 
 import 'leaflet';
 import 'leaflet.awesome-markers/dist/leaflet.awesome-markers';
-import 'leaflet-easybutton/src/easy-button';
+// import 'leaflet-easybutton/src/easy-button';
 import 'leaflet-editable/src/Leaflet.Editable';
-import 'leaflet-trackdrawer/src/index';
+import 'leaflet-routing-machine';
 
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
 import i18n from './i18n';
-
 import ShortKey from 'vue-shortkey';
 
 Vue.config.productionTip = false;

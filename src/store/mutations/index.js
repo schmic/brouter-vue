@@ -1,8 +1,3 @@
-import Segment from '@/model/Segment';
-import Waypoint from '@/model/Waypoint';
-
-import { statsCalc, statsReset } from '@/store/helpers/stats';
-
 export const mutations = {
     toolBarMode(state, mode) {
         state.toolBarMode = mode;
@@ -36,30 +31,26 @@ export const mutations = {
     nogosUpdate(state, nogos) {
         state.nogos = nogos;
     },
-    waypointsUpdate(state, trackDrawerNodes) {
-        // from trackdrawer event
-        let markers = [];
-        trackDrawerNodes.map(node => (markers = markers.concat(node.markers)));
-        state.waypoints = markers.map(
-            marker => new Waypoint(marker._leaflet_id, undefined, marker.getLatLng(), marker.options)
-        );
+    waypointUpdate(state, waypoint) {
+        const idx = state.waypoints.findIndex(el => el.id === waypoint.id);
+        if (idx >= 0) {
+            state.waypoints[idx] = waypoint;
+        } else {
+            state.waypoints.push(waypoint);
+        }
     },
-    segmentsUpdate(state, trackDrawerSteps) {
-        // from trackdrawer event
-        let edges = [];
-        trackDrawerSteps.map(step => (edges = edges.concat(step.edges)));
-        state.segments = edges.map(
-            edge =>
-                new Segment(edge._leaflet_id, edge._startMarkerId, edge._endMarkerId, edge.getLatLngs(), edge.options)
-        );
-        state.segments.length ? statsCalc(state) : statsReset(state);
+    waypointRemove(state, waypoint) {
+        waypoint.l.remove();
+        state.waypoints = state.waypoints.filter(_waypoint => !waypoint.equalsTo(_waypoint));
+    },
+
+    waypointsUpdate(state, waypoints) {
+        state.waypoints = waypoints;
     },
     routesUpdate(state, routes) {
         state.routes = routes;
     },
     routeLoad(state, route) {
-        console.log('route', route);
-
         ['trackname', 'alternativeIdx', 'profile', 'waypoints', 'nogos', 'pois', 'stats'].forEach(
             it => (state[it] = route[it])
         );

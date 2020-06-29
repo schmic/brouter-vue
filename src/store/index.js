@@ -10,6 +10,7 @@ import { getters } from './getters';
 
 import { createPOI } from '../model/POI';
 import { createNoGo } from '../model/NoGo';
+import { createWaypoint } from '../model/Waypoint';
 
 Vue.use(Vuex);
 
@@ -19,7 +20,7 @@ export default new Vuex.Store({
         trackname: Lockr.get('state/trackname', undefined),
         alternativeIdx: Lockr.get('state/alternativeIdx', 0),
         profile: Lockr.get(`state/profile`, 'fastbike'),
-        waypoints: Lockr.get('state/waypoints', []),
+        waypoints: Lockr.get('state/waypoints', []).map(waypoint => createWaypoint(waypoint)),
         nogos: Lockr.get('state/nogos', []).map(nogo => createNoGo(nogo)),
         pois: Lockr.get('state/pois', []).map(poi => createPOI(poi)),
         stats: {

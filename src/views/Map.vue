@@ -207,15 +207,16 @@ import { mapMutations, mapActions } from 'vuex';
 import { latLng } from 'leaflet';
 
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
-import BRouter from '@/util/BRouter';
-import TileProviders from '@/util/TileProviders';
+import BRouter from '../util/BRouter';
+import TileProviders from '../util/TileProviders';
 
-import RouteMeta from '@/components/RouteMeta.vue';
-import TrackMeta from '@/components/TrackMeta.vue';
-import PoiList from '@/components/PoiList.vue';
+import RouteMeta from '../components/RouteMeta.vue';
+import TrackMeta from '../components/TrackMeta.vue';
+import PoiList from '../components/PoiList.vue';
 
 import { createPOI } from '../model/POI';
 import { createNoGo } from '../model/NoGo';
+import { createWaypoint } from '../model/Waypoint';
 
 export default {
     name: 'Map',
@@ -234,13 +235,8 @@ export default {
                 menu: false
             },
             showSidebar: true,
-            trackDrawer: undefined,
-            trackDrawerToolBar: undefined,
-            trackDrawerOptions: {
-                debug: false,
-                routingCallback: BRouter.route
-            },
             tileProviders: TileProviders,
+            route: undefined,
             mapOptions: {
                 zoomControl: false,
                 attributionControl: true,
@@ -256,11 +252,10 @@ export default {
     computed: {
         toolBarMode: {
             get() {
-                return this.trackDrawerToolBar && this.trackDrawerToolBar.options.mode;
+                return this.$store.state.toolBarMode;
             },
             set(mode) {
-                this.trackDrawerToolBar.setMode(mode == this.toolBarMode ? null : mode);
-                this.$store.commit('toolBarMode', this.trackDrawerToolBar.options.mode);
+                this.$store.commit('toolBarMode', mode == this.toolBarMode ? null : mode);
             }
         }
     },
@@ -272,34 +267,21 @@ export default {
         this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
     },
     methods: {
-        ...mapMutations(['nogoUpdate', 'poiUpdate', 'poiRemove', 'waypointsUpdate', 'segmentsUpdate']),
+        ...mapMutations(['nogoUpdate', 'poiUpdate', 'poiRemove', 'waypointUpdate']),
         ...mapActions(['routeClear']),
         onMapReady() {
-            this.trackDrawer = window.L.TrackDrawer.track(this.trackDrawerOptions).addTo(this.$refs.map.mapObject);
-            this.trackDrawerToolBar = window.L.TrackDrawer.toolBar(this.trackDrawer).addTo(this.$refs.map.mapObject);
-
+            const map = this.$refs.map.mapObject;
             // import
-            this.$store.state.nogos.forEach(nogo => nogo.l.addTo(this.$refs.map.mapObject));
-            this.$store.state.pois.forEach(poi => poi.l.addTo(this.$refs.map.mapObject));
+            this.$store.state.nogos.forEach(nogo => nogo.l.addTo(map));
+            this.$store.state.pois.forEach(poi => poi.l.addTo(map));
+            // this.$store.state.waypoints.forEach(waypoint => waypoint.l.addTo(map));
 
-            this.$store.state.waypoints.forEach(waypoint => {
-                waypoint.options = waypoint.options || { type: 'waypoint' };
-                let marker = window.L.TrackDrawer.node(waypoint.latlng).setType(waypoint.options.type);
-                this.trackDrawerToolBar._bindMarkerEvents(marker);
-                this.trackDrawer.addNode(marker);
-            });
+            console.log('BRouter', BRouter);
 
-            this.trackDrawer.on('TrackDrawer:done', () => {
-                this.waypointsUpdate(this.trackDrawer.getNodes());
-                this.segmentsUpdate(this.trackDrawer.getSteps());
-            });
-
-            this.$store.subscribe(mutation => {
-                // this does not feel right here
-                if (mutation.type == 'alternativeIdxUpdate') this.refreshEdges();
-                if (mutation.type == 'profileUpdate') this.refreshEdges();
-                if (mutation.type == 'routeLoad') this.refreshEdges();
-            });
+            this.route = window.L.Routing.control({
+                router: BRouter,
+                waypoints: this.$store.state.waypoints.map(wp => window.L.latLng(wp.latlng))
+            }).addTo(map);
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;
@@ -310,17 +292,20 @@ export default {
             localStorage.setItem('map/center', JSON.stringify(center));
         },
         onMapClicked(evt) {
+            const map = this.$refs.map.mapObject;
             if (this.toolBarMode === 'nogo') {
                 let nogo = createNoGo({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
-                nogo.l.addTo(this.$refs.map.mapObject);
+                nogo.l.addTo(map);
                 this.nogoUpdate(nogo);
-                this.refreshEdges();
-                this.toolBarMode = undefined;
             } else if (this.toolBarMode === 'poi') {
                 let poi = createPOI({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
-                poi.l.addTo(this.$refs.map.mapObject);
+                poi.l.addTo(map);
                 this.poiUpdate(poi);
-                this.toolBarMode = undefined;
+            } else if (this.toolBarMode === 'add') {
+                let waypoint = createWaypoint({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                // waypoint.l.addTo(map);
+                this.waypointUpdate(waypoint);
+                this.route.setWaypoints(this.$store.state.waypoints.map(wp => window.L.latLng(wp.latlng)));
             }
         },
         setTileprovider(provider) {
@@ -332,9 +317,6 @@ export default {
         onRouteClear() {
             this.routeClear();
             location.reload();
-        },
-        refreshEdges() {
-            this.trackDrawer.refreshEdges();
         }
     }
 };

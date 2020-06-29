@@ -159,22 +159,44 @@ function getRouteShare(state) {
     );
 }
 
-function getRouteSegment(from, to) {
+function getRouteSegment(waypoints) {
     let nogos = store.state.nogos;
     let pois = [];
     let options = {
         alternativeidx: store.state.alternativeIdx,
         profile: store.state.profile
     };
-    return buildUrl([from, to], nogos, pois, options);
+    return buildUrl(waypoints, nogos, pois, options);
 }
 
-async function route(markerStart, markerEnd, done) {
-    const url = getRouteSegment(markerStart.getLatLng(), markerEnd.getLatLng());
+async function route(waypoints, done, context) {
+    const inputWaypoints = [].concat(waypoints);
+    waypoints = waypoints.map(wp => wp.latLng);
+    console.log('route() waypoints', this, waypoints);
+
+    const url = getRouteSegment(waypoints);
     try {
         let response = await fetch(url);
         let data = await response.json();
-        done(null, data);
+
+        const route = {
+            name: 'a Name',
+            summary: {
+                totalDistance: parseInt(data.features[0].properties['track-length']),
+                totalTime: parseInt(data.features[0].properties['total-time'])
+            },
+            coordinates: data.features[0].geometry.coordinates.map(coords => {
+                return {
+                    lat: coords[1],
+                    lng: coords[0],
+                    alt: coords[2]
+                };
+            }),
+            inputWaypoints: inputWaypoints,
+            waypoints: waypoints,
+            instructions: []
+        };
+        done.bind(context)(null, [route]);
     } catch (e) {
         console.log('fetch.error', e);
         done(e);
@@ -186,4 +208,4 @@ const BRouter = {
 };
 
 export default BRouter;
-export { buildUrl, splitUrl, getRouteSegment, getRouteDownload, getRouteShare };
+export { route, buildUrl, splitUrl, getRouteSegment, getRouteDownload, getRouteShare };

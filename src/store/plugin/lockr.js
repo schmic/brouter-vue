@@ -31,6 +31,13 @@ const LockrPlugin = store => {
                 state[stateKey].map(nogo => nogo.serialize())
             );
         }
+        if (['waypointUpdate', 'waypointRemove', 'waypointsUpdate'].includes(mutation.type)) {
+            const stateKey = 'waypoints';
+            Lockr.set(
+                `state/${stateKey}`,
+                state[stateKey].map(waypoint => waypoint.serialize())
+            );
+        }
     });
 };
 
