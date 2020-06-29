@@ -55,7 +55,6 @@ export const createNoGo = _nogo => {
             } else {
                 nogo.l.setStyle({ color: '#3388ff' });
                 store.commit('nogoUpdate', nogo);
-                // TODO: this.refreshEdges();
             }
         }
     });

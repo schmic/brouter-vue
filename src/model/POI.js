@@ -52,7 +52,7 @@ export const createPOI = _poi => {
             icon: window.L.AwesomeMarkers.icon({
                 ...{
                     // defaults
-                    icon: 'map-marker-alt',
+                    icon: 'map-marked-alt',
                     prefix: 'fa',
                     markerColor: 'purple'
                 },
@@ -62,7 +62,7 @@ export const createPOI = _poi => {
         ..._poi.options
     };
 
-    let poi = new POI(window.L.marker(_poi.latlng, options), name);
+    let poi = new POI(window.L.marker(_poi.latlng, options));
     poi.l.on('click', evt => {
         window.L.DomEvent.stop(evt);
         if (store.state.toolBarMode == 'delete') {

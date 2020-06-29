@@ -1,9 +1,11 @@
 import Segment from '@/model/Segment';
-import Waypoint from '@/model/Waypoint';
 
 import { statsCalc, statsReset } from '@/store/helpers/stats';
 
 export const mutations = {
+    trackUpdate(state, track) {
+        state.track = track;
+    },
     toolBarMode(state, mode) {
         state.toolBarMode = mode;
     },
@@ -36,13 +38,27 @@ export const mutations = {
     nogosUpdate(state, nogos) {
         state.nogos = nogos;
     },
-    waypointsUpdate(state, trackDrawerNodes) {
-        // from trackdrawer event
-        let markers = [];
-        trackDrawerNodes.map(node => (markers = markers.concat(node.markers)));
-        state.waypoints = markers.map(
-            marker => new Waypoint(marker._leaflet_id, undefined, marker.getLatLng(), marker.options)
-        );
+    waypointUpdate(state, waypoint) {
+        const idx = state.waypoints.findIndex(el => el.id === waypoint.id);
+        if (idx >= 0) {
+            state.waypoints[idx] = waypoint;
+        } else {
+            state.waypoints.push(waypoint);
+        }
+    },
+    waypointPromote(state, waypoint) {
+        state.track.promoteNodeToStopover(waypoint.l);
+    },
+    waypointDemote(state, waypoint) {
+        state.track.demoteNodeToWaypoint(waypoint.l);
+    },
+    waypointRemove(state, waypoint) {
+        state.track.removeNode(waypoint.l);
+        // waypoint.l.remove();
+        state.waypoints = state.waypoints.filter(_waypoint => !waypoint.equalsTo(_waypoint));
+    },
+    waypointsUpdate(state, waypoints) {
+        state.waypoints = waypoints;
     },
     segmentsUpdate(state, trackDrawerSteps) {
         // from trackdrawer event
