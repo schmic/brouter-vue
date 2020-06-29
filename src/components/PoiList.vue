@@ -17,9 +17,15 @@
                     <th>Lat / Lng</th>
                     <th></th>
                 </tr>
-                <tr v-for="(poi, index) in pois" :key="poi.id">
+                <tr
+                    v-for="(poi, index) in pois"
+                    :key="poi.id"
+                    :class="{ hover: poi.hover }"
+                    @mouseenter="onHover(poi, true)"
+                    @mouseleave="onHover(poi, false)"
+                >
                     <td>
-                        <span> {{ poi.name ? poi.name.substring(0, 16) : index + 1 }} </span>
+                        <span> {{ poi.name ? poi.name : index + 1 }} </span>
                     </td>
                     <td>
                         <span> {{ poi.latlng.lat.toFixed(6) }} </span>
@@ -38,8 +44,22 @@ export default {
         pois() {
             return this.$store.state.pois;
         }
+    },
+    methods: {
+        onHover(poi, isHover) {
+            if (isHover) {
+                poi.l.bindTooltip(poi.name).openTooltip();
+            } else {
+                poi.l.closeTooltip();
+            }
+        }
     }
 };
 </script>
 
-<style></style>
+<style>
+tr:hover {
+    background-color: rgb(212, 212, 212);
+    cursor: default;
+}
+</style>
