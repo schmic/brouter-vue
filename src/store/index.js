@@ -30,6 +30,7 @@ export default new Vuex.Store({
             ascend: 0,
             descend: 0
         },
+        segments: [],
         toolBarMode: undefined,
         track: undefined,
         routes: Lockr.get('routes', [])

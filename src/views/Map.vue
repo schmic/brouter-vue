@@ -39,6 +39,17 @@
                                 <i class="fa" :class="showSidebar ? 'fa-angle-left' : 'fa-angle-right'"></i>
                             </span>
                         </button>
+                        <button
+                            class="button is-primary"
+                            @click="
+                                showFooter = !showFooter;
+                                $refs.map.mapObject._onResize();
+                            "
+                        >
+                            <span class="icon">
+                                <i class="fa" :class="showFooter ? 'fa-chart-area' : 'fa-chart-area'"></i>
+                            </span>
+                        </button>
                         <div class="dropdown" :class="{ 'is-active': dropDown.menu }" style="margin-right: 1em">
                             <div class="dropdown-trigger">
                                 <button
@@ -189,13 +200,8 @@
                     </l-control>
                 </l-map>
             </div>
-            <div id="map-footer" class="level">
-                <div class="level-item has-text-centered">
-                    <div>
-                        <p class="title">Footer</p>
-                        <p class="heading">for the map</p>
-                    </div>
-                </div>
+            <div v-show="showFooter" id="map-footer">
+                <height-profile></height-profile>
             </div>
         </div>
         <div id="map-meta" class="column">Sidebar for more information</div>
@@ -213,6 +219,7 @@ import TileProviders from '../util/TileProviders';
 import RouteMeta from '../components/RouteMeta.vue';
 import TrackMeta from '../components/TrackMeta.vue';
 import PoiList from '../components/PoiList.vue';
+import HeightProfile from '../components/chart/HeightProfile.vue';
 
 import { createPOI } from '../model/POI';
 import { createNoGo } from '../model/NoGo';
@@ -221,6 +228,7 @@ import { createWaypoint } from '../model/Waypoint';
 export default {
     name: 'Map',
     components: {
+        HeightProfile,
         RouteMeta,
         TrackMeta,
         PoiList,
@@ -235,6 +243,7 @@ export default {
                 menu: false
             },
             showSidebar: true,
+            showFooter: false,
             tileProviders: TileProviders,
             mapOptions: {
                 zoomControl: false,
@@ -376,9 +385,8 @@ export default {
     padding-left: 0;
 }
 
-#map-footer {
-    display: none;
-}
+/* #map-footer {
+} */
 
 #map-meta {
     display: none;

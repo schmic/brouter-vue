@@ -16,10 +16,14 @@ import i18n from './i18n';
 
 import ShortKey from 'vue-shortkey';
 
+import Chartkick from 'vue-chartkick';
+import Chart from 'chart.js';
+
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
 Vue.use(ShortKey, { prevent: ['input', 'textarea'] });
+Vue.use(Chartkick.use(Chart));
 
 import { Icon } from 'leaflet';
 delete Icon.Default.prototype._getIconUrl;
