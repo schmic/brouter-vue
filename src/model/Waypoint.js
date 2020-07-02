@@ -47,6 +47,8 @@ export default class Waypoint {
 }
 
 export const createWaypoint = _waypoint => {
+    console.log('createWaypoint', _waypoint);
+
     let options = {
         ...{
             // defaults
