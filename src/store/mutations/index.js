@@ -3,6 +3,12 @@ import Segment from '@/model/Segment';
 import { statsCalc, statsReset } from '@/store/helpers/stats';
 
 export const mutations = {
+    mapCenter(state, center) {
+        state.mapCenter = center;
+    },
+    mapZoom(state, zoom) {
+        state.mapZoom = zoom;
+    },
     trackUpdate(state, track) {
         state.track = track;
     },

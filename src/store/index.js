@@ -33,7 +33,9 @@ export default new Vuex.Store({
         segments: [],
         toolBarMode: undefined,
         track: undefined,
-        routes: Lockr.get('routes', [])
+        routes: Lockr.get('routes', []),
+        mapCenter: Lockr.get('map/center', { lat: 49.0, lng: 8.0 }),
+        mapZoom: Lockr.get('map/zoom', 10)
     },
     mutations,
     actions,

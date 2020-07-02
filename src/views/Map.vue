@@ -210,7 +210,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex';
-import { latLng, TrackDrawer } from 'leaflet';
+import { TrackDrawer } from 'leaflet';
 
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
 import BRouter from '../util/BRouter';
@@ -250,9 +250,7 @@ export default {
                 attributionControl: true,
                 zoomSnap: 0.5,
                 editable: true
-            },
-            zoom: 10,
-            center: latLng(49.73868, 8.62084)
+            }
         };
     },
     computed: {
@@ -271,14 +269,23 @@ export default {
             set(newTrack) {
                 this.$store.commit('trackUpdate', newTrack);
             }
+        },
+        zoom: {
+            get() {
+                return this.$store.state.mapCenter;
+            },
+            set(value) {
+                this.$store.commit('mapCenter', value);
+            }
+        },
+        center: {
+            get() {
+                return this.$store.state.mapZoom;
+            },
+            set(value) {
+                this.$store.commit('mapZoom', value);
+            }
         }
-    },
-    created() {
-        let defaultZoom = JSON.stringify(this.zoom);
-        this.zoom = parseInt(localStorage.getItem('map/zoom') || defaultZoom);
-
-        let defaultCenter = JSON.stringify(this.center);
-        this.center = JSON.parse(localStorage.getItem('map/center') || defaultCenter);
     },
     methods: {
         ...mapMutations(['nogoUpdate', 'poiUpdate', 'waypointUpdate', 'segmentsUpdate']),
@@ -308,11 +315,9 @@ export default {
         },
         onMapZoomChanged(zoom) {
             this.zoom = zoom;
-            localStorage.setItem('map/zoom', zoom);
         },
         onMapCenterChanged(center) {
             this.center = center;
-            localStorage.setItem('map/center', JSON.stringify(center));
         },
         onMapClicked(evt) {
             const map = this.$refs.map.mapObject;

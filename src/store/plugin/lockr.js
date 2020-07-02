@@ -17,6 +17,13 @@ const LockrPlugin = store => {
             .filter(type => mutation.type.startsWith(type))
             .forEach(it => Lockr.set(`state/${it}`, state[it]));
 
+        if (mutation.type == 'mapCenter') {
+            Lockr.set(`map/center`, state.mapCenter);
+        }
+        if (mutation.type == 'mapZoom') {
+            Lockr.set(`map/zoom`, state.mapZoom);
+        }
+
         if (['poiUpdate', 'poiRemove', 'poisUpdate'].includes(mutation.type)) {
             const stateKey = 'pois';
             Lockr.set(
