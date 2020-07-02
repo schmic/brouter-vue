@@ -1,6 +1,7 @@
-import store from '../store';
 import { uuid } from 'uuidv4';
+import { DomEvent, AwesomeMarkers, TrackDrawer } from 'leaflet';
 
+import store from '../store';
 export default class Waypoint {
     constructor(l, id, name) {
         this.l = l;
@@ -50,7 +51,7 @@ export const createWaypoint = _waypoint => {
         ...{
             // defaults
             draggable: true,
-            icon: window.L.AwesomeMarkers.icon({
+            icon: AwesomeMarkers.icon({
                 ...{
                     // defaults
                     icon: 'map-marker-alt',
@@ -62,12 +63,12 @@ export const createWaypoint = _waypoint => {
         },
         ..._waypoint.options
     };
-    let waypoint = new Waypoint(window.L.TrackDrawer.node(_waypoint.latlng, options));
+    let waypoint = new Waypoint(TrackDrawer.node(_waypoint.latlng, options));
     waypoint.l.on('moveend', () => {
         store.commit('waypointUpdate', waypoint);
     });
     waypoint.l.on('click', evt => {
-        window.L.DomEvent.stop(evt);
+        DomEvent.stop(evt);
         if (store.state.toolBarMode == 'delete') {
             store.commit('waypointRemove', waypoint);
         }

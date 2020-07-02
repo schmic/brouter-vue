@@ -1,5 +1,7 @@
-import store from '../store';
 import { uuid } from 'uuidv4';
+import { DomEvent, circle } from 'leaflet';
+
+import store from '../store';
 
 export default class NoGo {
     constructor(l, id) {
@@ -43,9 +45,9 @@ export const createNoGo = _nogo => {
         ...{ radius: _nogo.radius || 2000 }
     };
 
-    let nogo = new NoGo(window.L.circle(_nogo.latlng, options));
+    let nogo = new NoGo(circle(_nogo.latlng, options));
     nogo.l.on('click', evt => {
-        window.L.DomEvent.stop(evt);
+        DomEvent.stop(evt);
         if (store.state.toolBarMode == 'delete') {
             store.commit('nogoRemove', nogo);
         } else {

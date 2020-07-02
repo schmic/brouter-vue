@@ -210,7 +210,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex';
-import { latLng } from 'leaflet';
+import { latLng, TrackDrawer } from 'leaflet';
 
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
 import BRouter from '../util/BRouter';
@@ -285,7 +285,8 @@ export default {
         ...mapActions(['routeClear']),
         onMapReady() {
             const map = this.$refs.map.mapObject;
-            this.track = window.L.TrackDrawer.track({ routingCallback: BRouter.route }).addTo(map);
+
+            this.track = TrackDrawer.track({ routingCallback: BRouter.route }).addTo(map);
             this.track.on('TrackDrawer:done', () => {
                 // this.waypointsUpdate(this.track.getNodes());
                 this.segmentsUpdate(this.track.getSteps());

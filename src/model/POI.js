@@ -1,6 +1,7 @@
-import store from '../store';
 import { uuid } from 'uuidv4';
+import { DomEvent, AwesomeMarkers, marker } from 'leaflet';
 
+import store from '../store';
 export default class POI {
     constructor(l, id, name) {
         this.l = l;
@@ -49,7 +50,7 @@ export const createPOI = _poi => {
         ...{
             // defaults
             draggable: true,
-            icon: window.L.AwesomeMarkers.icon({
+            icon: AwesomeMarkers.icon({
                 ...{
                     // defaults
                     icon: 'map-marked-alt',
@@ -62,9 +63,9 @@ export const createPOI = _poi => {
         ..._poi.options
     };
 
-    let poi = new POI(window.L.marker(_poi.latlng, options));
+    let poi = new POI(marker(_poi.latlng, options));
     poi.l.on('click', evt => {
-        window.L.DomEvent.stop(evt);
+        DomEvent.stop(evt);
         if (store.state.toolBarMode == 'delete') {
             store.commit('poiRemove', poi);
         }
