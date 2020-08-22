@@ -42,7 +42,6 @@ export default {
                     distance = distance + parseInt(message[3]) / 1000;
                 });
             });
-            console.log('this.datacollection', this.datacollection);
         },
         resetData() {
             this.datacollection = [
