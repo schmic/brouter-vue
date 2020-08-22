@@ -109,7 +109,6 @@
                             </div>
                         </div>
                     </l-control>
-                    <l-control position="topright"> </l-control>
                     <l-control position="bottomleft">
                         <div v-shortkey="['esc']" class="buttons has-addons" @shortkey="toolBarMode = undefined">
                             <button
@@ -146,18 +145,6 @@
                             >
                                 <span class="icon">
                                     <i class="fas fa-map-marker-alt"></i>
-                                </span>
-                            </button>
-                            <button
-                                v-shortkey="['s']"
-                                class="button is-dark is-rounded"
-                                title="Split route (s)"
-                                :class="{ 'is-primary': toolBarMode === 'insert' }"
-                                @shortkey="toolBarMode = 'insert'"
-                                @click="toolBarMode = 'insert'"
-                            >
-                                <span class="icon">
-                                    <i class="fa fa-cut"></i>
                                 </span>
                             </button>
                             <button
@@ -210,7 +197,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex';
-import { TrackDrawer } from 'leaflet';
+import { TrackDrawer, divIcon, marker } from 'leaflet';
 
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet';
 import BRouter from '../util/BRouter';
@@ -272,18 +259,18 @@ export default {
         },
         zoom: {
             get() {
-                return this.$store.state.mapCenter;
-            },
-            set(value) {
-                this.$store.commit('mapCenter', value);
-            }
-        },
-        center: {
-            get() {
                 return this.$store.state.mapZoom;
             },
             set(value) {
                 this.$store.commit('mapZoom', value);
+            }
+        },
+        center: {
+            get() {
+                return this.$store.state.mapCenter;
+            },
+            set(value) {
+                this.$store.commit('mapCenter', value);
             }
         }
     },
@@ -293,11 +280,23 @@ export default {
         onMapReady() {
             const map = this.$refs.map.mapObject;
 
+            map._mouseMarker = marker(map.getCenter(), {
+                interactive: true,
+                draggable: true,
+                opacity: 0,
+                icon: divIcon({
+                    className: 'line-mouse-marker',
+                    iconAnchor: [8, 8], // size/2 + border/2
+                    iconSize: [16, 16]
+                })
+            })
+                .on('dragstart', () => {})
+                .on('drag', () => {})
+                .on('dragend', () => {})
+                .addTo(map);
+
             this.track = TrackDrawer.track({ routingCallback: BRouter.route }).addTo(map);
-            this.track.on('TrackDrawer:done', () => {
-                // this.waypointsUpdate(this.track.getNodes());
-                this.segmentsUpdate(this.track.getSteps());
-            });
+            this.track.on('TrackDrawer:done', () => this.segmentsUpdate(this.track.getSteps()));
 
             // this does not feel right here
             this.$store.subscribe(mutation => {
@@ -322,16 +321,16 @@ export default {
         onMapClicked(evt) {
             const map = this.$refs.map.mapObject;
             if (this.toolBarMode === 'nogo') {
-                let nogo = createNoGo({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                let nogo = createNoGo({ latlng: evt.latlng });
                 nogo.l.addTo(map);
                 this.nogoUpdate(nogo);
                 this.track.refreshEdges();
             } else if (this.toolBarMode === 'poi') {
-                let poi = createPOI({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                let poi = createPOI({ latlng: evt.latlng });
                 poi.l.addTo(map);
                 this.poiUpdate(poi);
             } else if (this.toolBarMode === 'add') {
-                let waypoint = createWaypoint({ latlng: { lat: evt.latlng.lat, lng: evt.latlng.lng } });
+                let waypoint = createWaypoint({ latlng: evt.latlng });
                 waypoint.l.addTo(this.track);
                 this.waypointUpdate(waypoint);
             }

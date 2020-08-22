@@ -1,6 +1,5 @@
-import Segment from '@/model/Segment';
-
-import { statsCalc, statsReset } from '@/store/helpers/stats';
+import { statsCalc, statsReset } from '../helpers/stats';
+import { createSegment } from '../../model/Segment';
 
 export const mutations = {
     mapCenter(state, center) {
@@ -70,10 +69,7 @@ export const mutations = {
         // from trackdrawer event
         let edges = [];
         trackDrawerSteps.map(step => (edges = edges.concat(step.edges)));
-        state.segments = edges.map(
-            edge =>
-                new Segment(edge._leaflet_id, edge._startMarkerId, edge._endMarkerId, edge.getLatLngs(), edge.options)
-        );
+        state.segments = edges.map(edge => createSegment(edge));
         state.segments.length ? statsCalc(state) : statsReset(state);
     },
     routesUpdate(state, routes) {
